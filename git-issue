@@ -1,16 +1,18 @@
 #!/bin/sh
 
 if [ -z "$1" ]; then
-  exit
+  cmd=ls
+else
+  cmd=$1
 fi
 
 set -e
 base=`git rev-parse --show-toplevel`
 issues=$base/.issues
-cmd=$1
 
 git stash >/dev/null
 case $cmd in
+
   init)
     if [ -d $issues ]; then
       echo $issues directory already exists
@@ -23,22 +25,33 @@ case $cmd in
     git add $base/.gitignore
     git commit -m 'git issues initialized'
     ;;
+
   new)
     id=`cat $issues/seq`
     id=$((id + 1))
     echo $id > $issues/seq
     git add $issues/seq
     ticket=`mktemp /tmp/issue-$id-XXXXXX`
-    echo "New Ticket:" >$ticket
+    echo "=== issue title ===" >>$ticket
+    echo "" >>$ticket
+    echo "describe the new issue here" >>$ticket
     sensible-editor $ticket
     mv $ticket $issues/issue-$id
     ticket=$issues/issue-$id
     git add $ticket
     git commit -m "issue #$id created"
     ;;
-  *)
-    echo unknown command $cmd
+
+  ls)
+    id=`cat $issues/seq`
+    for i in `seq $id`
+    do
+      echo -n "#$i "
+      cat $issues/issue-$i
+      echo
+    done
     ;;
+
 esac
 git stash pop >/dev/null 2>&1
 

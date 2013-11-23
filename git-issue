@@ -1,57 +1,200 @@
-#!/bin/sh
+#!/usr/bin/python
 
-if [ -z "$1" ]; then
-  cmd=ls
-else
-  cmd=$1
-fi
+from sys import argv, stderr
+from subprocess import check_output, Popen
+import os
+import stat
+import re
+from uuid import uuid1
 
-set -e
-base=`git rev-parse --show-toplevel`
-issues=$base/.issues
+from colorful import colorful
 
-git stash >/dev/null
-case $cmd in
+class GitIssue:
+  def __init__(self):
+    self.base = check_output(["git", "rev-parse", "--show-toplevel"]).strip()
+    self.issues="%s/.issues"%self.base
 
-  init)
-    if [ -d $issues ]; then
-      echo $issues directory already exists
-      exit
-    fi
-    mkdir $issues
-    echo 0 >$issues/seq
-    git add $issues/seq
-    echo $issues/'*' >> $base/.gitignore # FIXME: if not already in there
-    git add $base/.gitignore
-    git commit -m 'git issues initialized'
-    ;;
+  def cmd_ls(self, args):
+    for i in os.listdir(self.issues):
+      issue = "%s/%s"%(self.issues, i)
+      if not stat.S_ISDIR(os.lstat(issue).st_mode):
+        continue
+      self.show_short(issue)
 
-  new)
-    id=`cat $issues/seq`
-    id=$((id + 1))
-    echo $id > $issues/seq
-    git add $issues/seq
-    ticket=`mktemp /tmp/issue-$id-XXXXXX`
-    echo "=== issue title ===" >>$ticket
-    echo "" >>$ticket
-    echo "describe the new issue here" >>$ticket
-    sensible-editor $ticket
-    mv $ticket $issues/issue-$id
-    ticket=$issues/issue-$id
-    git add $ticket
-    git commit -m "issue #$id created"
-    ;;
+  def cmd_show(self, args):
+    if len(args) != 1:
+      print "git issue show takes identifier as argument"
+      return
+    key = args[0]
+    issue_file = None
+    for i in os.listdir(self.issues):
+      issue = "%s/%s"%(self.issues, i)
+      if not stat.S_ISDIR(os.lstat(issue).st_mode):
+        continue
+      if i.split('-')[0] == key or i == key:
+        issue_file = "%s/issue"%issue
+        break
+    if not issue_file:
+      print "git issue %s not found"%key
+      return
 
-  ls)
-    id=`cat $issues/seq`
-    for i in `seq $id`
-    do
-      echo -n "#$i "
-      cat $issues/issue-$i
-      echo
-    done
-    ;;
+    f = open(issue_file, 'r')
+    blocks = f.read().split('\n\n')
+    f.close()
 
-esac
-git stash pop >/dev/null 2>&1
+    ident_short = self.get_ident_short(issue)
+    title = self.get_title(blocks)
+    length = len(ident_short) + len(title) + 2
+    print ident_short, colorful.bold_white(title)
+    print "~" * length
+    print '\n\n'.join(blocks)
+    print
+
+
+  def cmd_edit(self, args):
+    if len(args) < 1:
+      print "git issue edit takes one or more identifier as argument"
+      return
+    issue_files = []
+    for key in args:
+      issue_file = None
+      for i in os.listdir(self.issues):
+        issue = "%s/%s"%(self.issues, i)
+        if not stat.S_ISDIR(os.lstat(issue).st_mode):
+          continue
+        if i.split('-')[0] == key or i == key:
+          issue_file = "%s/issue"%issue
+          break
+      if not issue_file:
+        print "git issue %s not found"%key
+        return
+
+      issue_files.append(issue_file)
+
+    p = Popen( ["sensible-editor"] + issue_files )
+    p.communicate( )
+    p.wait()
+
+  def cmd_create(self, args):
+    if len(args) < 1:
+      print "git issue create needs arguments"
+      return
+
+    uuid = uuid1()
+    issue_path = "%s/%s"%(self.issues, uuid)
+    issue_file = "%s/issue"%issue_path
+    os.mkdir(issue_path)
+    fin = open("%s/template"%self.issues, "r")
+    fout = open(issue_file, "w")
+    for line in fin.readlines( ):
+      if line == "@title@\n":
+        line = " ".join(args)
+        line += "\n"
+        line += "=" * len(line)
+        line += "\n"
+      fout.write(line)
+    fin.close()
+    fout.close()
+
+    p = Popen( ["sensible-editor", issue_file])
+    p.communicate( )
+    p.wait()
+
+  def show_short(self, issue):
+    issue_file = "%s/issue"%issue
+    if not os.path.exists(issue_file):
+      stderr.write("issue file not found: %s\n"%issue_file)
+      return False
+
+
+    f = open(issue_file, 'r')
+    blocks = f.read().split('\n\n')
+    f.close()
+    print self.get_ident_short(issue), colorful.bold_white(self.get_title(blocks))
+
+  def get_ident(self, issue):
+    return os.path.basename(issue)
+
+  def get_ident_short(self, issue):
+    return self.get_ident(issue).split('-')[0]
+
+  def get_title(self, blocks):
+    RE = re.compile(r'^.*?\n[=-]+[ ]*(\n|$)', re.MULTILINE)
+    title = "no title"
+    idx = 0
+    for block in blocks:
+      if RE.match(block):
+        title = block.split('\n')[0].strip()
+        blocks.pop(idx)
+        break
+      idx += 1
+    return title
+
+#if [ -z "$1" ]; then
+  #cmd=ls
+#else
+  #cmd=$1
+#fi
+
+#set -e
+#base=`git rev-parse --show-toplevel`
+#issues=$base/.issues
+
+#git stash >/dev/null
+#case $cmd in
+
+  #init)
+    #if [ -d $issues ]; then
+      #echo $issues directory already exists
+      #exit
+    #fi
+    #mkdir $issues
+    #echo 0 >$issues/seq
+    #git add $issues/seq
+    #echo $issues/'*' >> $base/.gitignore # FIXME: if not already in there
+    #git add $base/.gitignore
+    #git commit -m 'git issues initialized'
+    #;;
+
+  #new)
+    #id=`cat $issues/seq`
+    #id=$((id + 1))
+    #echo $id > $issues/seq
+    #git add $issues/seq
+    #ticket=`mktemp /tmp/issue-$id-XXXXXX`
+    #echo "=== issue title ===" >>$ticket
+    #echo "" >>$ticket
+    #echo "describe the new issue here" >>$ticket
+    #sensible-editor $ticket
+    #mv $ticket $issues/issue-$id
+    #ticket=$issues/issue-$id
+    #git add $ticket
+    #git commit -m "issue #$id created"
+    #;;
+
+  #ls)
+    #id=`cat $issues/seq`
+    #for i in `seq $id`
+    #do
+      #echo -n "#$i "
+      #cat $issues/issue-$i
+      #echo
+    #done
+    #;;
+
+#esac
+#git stash pop >/dev/null 2>&1
+
+if __name__ == "__main__":
+  cmd = "ls"
+  if len(argv) > 1:
+    cmd = argv[1]
+
+  gi = GitIssue()
+  if hasattr(gi, "cmd_%s"%cmd):
+    getattr(gi, "cmd_%s"%cmd)(argv[2:])
+  else:
+    stderr.write("unknown command: %s\n"%cmd)
+
+
 

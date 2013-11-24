@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from sys import argv, stderr, exit
+from sys import argv, stdin, stdout, stderr, exit
 from subprocess import check_output, Popen
 import os
 import stat
@@ -32,6 +32,7 @@ class GitIssue:
     if len(args) != 1:
       stderr.write("git issue show takes identifier as argument\n")
       return False
+
     key = args[0]
     issue_file = None
     for i in os.listdir(self.issues):
@@ -137,6 +138,43 @@ class GitIssue:
     self.git.index.add([issue_file])
     self.git.index.commit("new issue: %s"%title)
     return True
+
+  def cmd_remove(self, args):
+    if len(args) != 1:
+      stderr.write("git issue delete takes identifier as argument\n")
+      return False
+
+    key = args[0]
+    issue_file = None
+    for i in os.listdir(self.issues):
+      issue_path = "%s/%s"%(self.issues, i)
+      if not stat.S_ISDIR(os.lstat(issue_path).st_mode):
+        continue
+      if i.split('-')[0] == key or i == key:
+        issue_file = "%s/issue"%issue_path
+        break
+    if not issue_file:
+      stderr.write("git issue %s not found\n"%key)
+      return False
+
+    blocks = self.read_issue(issue_file)
+    if blocks:
+      title = self.get_title(blocks)
+    else:
+      title = "no title"
+
+    stdout.write("remove issue %s: %s ? [Y/n] "%(key, title))
+    try:
+      answer = stdin.readline().strip()
+    except KeyboardInterrupt:
+      return False
+    if not answer or answer.lower() == "y":
+      from shutil import rmtree
+      rmtree(issue_path)
+
+      self.git.index.remove([issue_path], r = True)
+      self.git.index.commit("issue removed: %s"%title)
+
 
 
   def read_issue(self, issue_file):

@@ -64,6 +64,11 @@ class GitIssue:
     if len(args) < 1:
       stderr.write("git issue edit takes one or more identifier as argument\n")
       return False
+
+    if self.git.is_dirty():
+      stderr.write("repo is dirty\n")
+      return False
+
     issue_files = []
     for key in args:
       issue_file = None
@@ -83,7 +88,15 @@ class GitIssue:
     p = Popen( ["sensible-editor"] + issue_files )
     p.communicate( )
     p.wait()
-    return Teru
+
+    for issue_file in issue_files:
+      blocks = self.read_issue(issue_file)
+      if not blocks:
+        continue
+      title = self.get_title(blocks)
+      self.git.index.add([issue_file])
+      self.git.index.commit("issue updated: %s"%title)
+    return True
 
   def cmd_create(self, args):
     if len(args) < 1:
@@ -171,7 +184,9 @@ if __name__ == "__main__":
     stderr.write("not a git repo\n")
     exit(1)
   if hasattr(gi, "cmd_%s"%cmd):
-    exit(getattr(gi, "cmd_%s"%cmd)(argv[2:]))
+    if not getattr(gi, "cmd_%s"%cmd)(argv[2:]):
+      exit( 1 )
+    exit( 0 )
   else:
     stderr.write("unknown command: %s\n"%cmd)
     exit(2)

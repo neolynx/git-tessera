@@ -1,30 +1,37 @@
 #!/usr/bin/python
 
-from sys import argv, stderr
+from sys import argv, stderr, exit
 from subprocess import check_output, Popen
 import os
 import stat
 import re
+import git
 from uuid import uuid1
 
 from colorful import colorful
 
+def cmp_issue(a, b):
+  aa = os.lstat("%s/issue"%a)
+  bb = os.lstat("%s/issue"%b)
+  return aa.st_ctime < bb.st_ctime
+
 class GitIssue:
   def __init__(self):
-    self.base = check_output(["git", "rev-parse", "--show-toplevel"]).strip()
-    self.issues="%s/.issues"%self.base
+    self.git = git.Repo(".")
+
+    self.issues="%s/.issues"%self.git.working_dir
 
   def cmd_ls(self, args):
-    for i in os.listdir(self.issues):
-      issue = "%s/%s"%(self.issues, i)
-      if not stat.S_ISDIR(os.lstat(issue).st_mode):
-        continue
+    contents = [ self.issues + "/" + x for x in os.listdir(self.issues) if stat.S_ISDIR(os.lstat(self.issues + "/" + x).st_mode)]
+    sorted(contents, cmp = cmp_issue)
+    for issue in contents:
       self.show_short(issue)
+    return True
 
   def cmd_show(self, args):
     if len(args) != 1:
-      print "git issue show takes identifier as argument"
-      return
+      stderr.write("git issue show takes identifier as argument\n")
+      return False
     key = args[0]
     issue_file = None
     for i in os.listdir(self.issues):
@@ -35,8 +42,8 @@ class GitIssue:
         issue_file = "%s/issue"%issue
         break
     if not issue_file:
-      print "git issue %s not found"%key
-      return
+      stderr.write("git issue %s not found\n"%key)
+      return False
 
     f = open(issue_file, 'r')
     blocks = f.read().split('\n\n')
@@ -46,15 +53,17 @@ class GitIssue:
     title = self.get_title(blocks)
     length = len(ident_short) + len(title) + 2
     print ident_short, colorful.bold_white(title)
-    print "~" * length
+    print "=" * length
+    print
     print '\n\n'.join(blocks)
     print
+    return True
 
 
   def cmd_edit(self, args):
     if len(args) < 1:
-      print "git issue edit takes one or more identifier as argument"
-      return
+      stderr.write("git issue edit takes one or more identifier as argument\n")
+      return False
     issue_files = []
     for key in args:
       issue_file = None
@@ -66,20 +75,29 @@ class GitIssue:
           issue_file = "%s/issue"%issue
           break
       if not issue_file:
-        print "git issue %s not found"%key
-        return
+        stder.write("git issue %s not found\n"%key)
+        return False
 
       issue_files.append(issue_file)
 
     p = Popen( ["sensible-editor"] + issue_files )
     p.communicate( )
     p.wait()
+    return Teru
 
   def cmd_create(self, args):
     if len(args) < 1:
-      print "git issue create needs arguments"
-      return
+      stderr.write("git issue create needs arguments\n")
+      return False
 
+    if self.git.is_dirty():
+      stderr.write("repo is dirty\n")
+      return False
+
+    if args:
+      title = " ".join(args)
+    else:
+      title = "issue title goes here"
     uuid = uuid1()
     issue_path = "%s/%s"%(self.issues, uuid)
     issue_file = "%s/issue"%issue_path
@@ -88,10 +106,8 @@ class GitIssue:
     fout = open(issue_file, "w")
     for line in fin.readlines( ):
       if line == "@title@\n":
-        line = " ".join(args)
-        line += "\n"
-        line += "=" * len(line)
-        line += "\n"
+        line = "%s\n"%title
+        line += ("=" * (len(title) + 1)) + "\n"
       fout.write(line)
     fin.close()
     fout.close()
@@ -100,17 +116,31 @@ class GitIssue:
     p.communicate( )
     p.wait()
 
-  def show_short(self, issue):
-    issue_file = "%s/issue"%issue
+    blocks = self.read_issue(issue_file)
+    if not blocks:
+      return False
+    title = self.get_title(blocks)
+
+    self.git.index.add([issue_file])
+    self.git.index.commit("new issue: %s"%title)
+    return True
+
+
+  def read_issue(self, issue_file):
     if not os.path.exists(issue_file):
       stderr.write("issue file not found: %s\n"%issue_file)
-      return False
-
+      return None
 
     f = open(issue_file, 'r')
     blocks = f.read().split('\n\n')
     f.close()
-    print self.get_ident_short(issue), colorful.bold_white(self.get_title(blocks))
+    return blocks
+
+  def show_short(self, issue):
+    issue_file = "%s/issue"%issue
+    blocks = self.read_issue(issue_file)
+    if blocks:
+      print self.get_ident_short(issue), colorful.bold_white(self.get_title(blocks))
 
   def get_ident(self, issue):
     return os.path.basename(issue)
@@ -130,71 +160,21 @@ class GitIssue:
       idx += 1
     return title
 
-#if [ -z "$1" ]; then
-  #cmd=ls
-#else
-  #cmd=$1
-#fi
-
-#set -e
-#base=`git rev-parse --show-toplevel`
-#issues=$base/.issues
-
-#git stash >/dev/null
-#case $cmd in
-
-  #init)
-    #if [ -d $issues ]; then
-      #echo $issues directory already exists
-      #exit
-    #fi
-    #mkdir $issues
-    #echo 0 >$issues/seq
-    #git add $issues/seq
-    #echo $issues/'*' >> $base/.gitignore # FIXME: if not already in there
-    #git add $base/.gitignore
-    #git commit -m 'git issues initialized'
-    #;;
-
-  #new)
-    #id=`cat $issues/seq`
-    #id=$((id + 1))
-    #echo $id > $issues/seq
-    #git add $issues/seq
-    #ticket=`mktemp /tmp/issue-$id-XXXXXX`
-    #echo "=== issue title ===" >>$ticket
-    #echo "" >>$ticket
-    #echo "describe the new issue here" >>$ticket
-    #sensible-editor $ticket
-    #mv $ticket $issues/issue-$id
-    #ticket=$issues/issue-$id
-    #git add $ticket
-    #git commit -m "issue #$id created"
-    #;;
-
-  #ls)
-    #id=`cat $issues/seq`
-    #for i in `seq $id`
-    #do
-      #echo -n "#$i "
-      #cat $issues/issue-$i
-      #echo
-    #done
-    #;;
-
-#esac
-#git stash pop >/dev/null 2>&1
-
 if __name__ == "__main__":
   cmd = "ls"
   if len(argv) > 1:
     cmd = argv[1]
 
-  gi = GitIssue()
+  try:
+    gi = GitIssue()
+  except git.exc.InvalidGitRepositoryError:
+    stderr.write("not a git repo\n")
+    exit(1)
   if hasattr(gi, "cmd_%s"%cmd):
-    getattr(gi, "cmd_%s"%cmd)(argv[2:])
+    exit(getattr(gi, "cmd_%s"%cmd)(argv[2:]))
   else:
     stderr.write("unknown command: %s\n"%cmd)
+    exit(2)
 
 
 

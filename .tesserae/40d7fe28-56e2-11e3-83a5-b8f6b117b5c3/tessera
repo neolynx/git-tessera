@@ -1,6 +1,5 @@
-allow minimum unique id usage
-=============================
+# allow minimum unique id usage
 
 if an id of 3d9 is unique,
-git show 3d9 should be enough, like 
+git show 3d9 should be enough, like
 the hash usage in git.

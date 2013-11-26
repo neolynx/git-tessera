@@ -10,47 +10,47 @@ from uuid import uuid1
 
 from colorful import colorful
 
-def cmp_issue(a, b):
-  aa = os.lstat("%s/issue"%a)
-  bb = os.lstat("%s/issue"%b)
+def cmp_tessera(a, b):
+  aa = os.lstat("%s/tessera"%a)
+  bb = os.lstat("%s/tessera"%b)
   return aa.st_ctime < bb.st_ctime
 
-class GitIssue:
+class GitTessera:
   def __init__(self):
     self.git = git.Repo(".")
 
-    self.issues="%s/.issues"%self.git.working_dir
+    self.tesserae="%s/.tesserae"%self.git.working_dir
 
   def cmd_ls(self, args):
-    contents = [ self.issues + "/" + x for x in os.listdir(self.issues) if stat.S_ISDIR(os.lstat(self.issues + "/" + x).st_mode)]
-    sorted(contents, cmp = cmp_issue)
-    for issue in contents:
-      self.show_short(issue)
+    contents = [ self.tesserae + "/" + x for x in os.listdir(self.tesserae) if stat.S_ISDIR(os.lstat(self.tesserae + "/" + x).st_mode)]
+    sorted(contents, cmp = cmp_tessera)
+    for tessera in contents:
+      self.show_short(tessera)
     return True
 
   def cmd_show(self, args):
     if len(args) != 1:
-      stderr.write("git issue show takes identifier as argument\n")
+      stderr.write("git tessera show takes identifier as argument\n")
       return False
 
     key = args[0]
-    issue_file = None
-    for i in os.listdir(self.issues):
-      issue = "%s/%s"%(self.issues, i)
-      if not stat.S_ISDIR(os.lstat(issue).st_mode):
+    tessera_file = None
+    for i in os.listdir(self.tesserae):
+      tessera = "%s/%s"%(self.tesserae, i)
+      if not stat.S_ISDIR(os.lstat(tessera).st_mode):
         continue
       if i.split('-')[0] == key or i == key:
-        issue_file = "%s/issue"%issue
+        tessera_file = "%s/tessera"%tessera
         break
-    if not issue_file:
-      stderr.write("git issue %s not found\n"%key)
+    if not tessera_file:
+      stderr.write("git tessera %s not found\n"%key)
       return False
 
-    f = open(issue_file, 'r')
+    f = open(tessera_file, 'r')
     blocks = f.read().split('\n\n')
     f.close()
 
-    ident_short = self.get_ident_short(issue)
+    ident_short = self.get_ident_short(tessera)
     title = self.get_title(blocks)
     length = len(ident_short) + len(title) + 2
     print ident_short, colorful.bold_white(title)
@@ -63,45 +63,45 @@ class GitIssue:
 
   def cmd_edit(self, args):
     if len(args) < 1:
-      stderr.write("git issue edit takes one or more identifier as argument\n")
+      stderr.write("git tessera edit takes one or more identifier as argument\n")
       return False
 
     if self.git.is_dirty():
       stderr.write("repo is dirty\n")
       return False
 
-    issue_files = []
+    tessera_files = []
     for key in args:
-      issue_file = None
-      for i in os.listdir(self.issues):
-        issue = "%s/%s"%(self.issues, i)
-        if not stat.S_ISDIR(os.lstat(issue).st_mode):
+      tessera_file = None
+      for i in os.listdir(self.tesserae):
+        tessera = "%s/%s"%(self.tesserae, i)
+        if not stat.S_ISDIR(os.lstat(tessera).st_mode):
           continue
         if i.split('-')[0] == key or i == key:
-          issue_file = "%s/issue"%issue
+          tessera_file = "%s/tessera"%tessera
           break
-      if not issue_file:
-        stder.write("git issue %s not found\n"%key)
+      if not tessera_file:
+        stder.write("git tessera %s not found\n"%key)
         return False
 
-      issue_files.append(issue_file)
+      tessera_files.append(tessera_file)
 
-    p = Popen( ["sensible-editor"] + issue_files )
+    p = Popen( ["sensible-editor"] + tessera_files )
     p.communicate( )
     p.wait()
 
-    for issue_file in issue_files:
-      blocks = self.read_issue(issue_file)
+    for tessera_file in tessera_files:
+      blocks = self.read_tessera(tessera_file)
       if not blocks:
         continue
       title = self.get_title(blocks)
-      self.git.index.add([issue_file])
-      self.git.index.commit("issue updated: %s"%title)
+      self.git.index.add([tessera_file])
+      self.git.index.commit("tessera updated: %s"%title)
     return True
 
   def cmd_create(self, args):
     if len(args) < 1:
-      stderr.write("git issue create needs arguments\n")
+      stderr.write("git tessera create needs arguments\n")
       return False
 
     if self.git.is_dirty():
@@ -111,13 +111,13 @@ class GitIssue:
     if args:
       title = " ".join(args)
     else:
-      title = "issue title goes here"
+      title = "tessera title goes here"
     uuid = uuid1()
-    issue_path = "%s/%s"%(self.issues, uuid)
-    issue_file = "%s/issue"%issue_path
-    os.mkdir(issue_path)
-    fin = open("%s/template"%self.issues, "r")
-    fout = open(issue_file, "w")
+    tessera_path = "%s/%s"%(self.tesserae, uuid)
+    tessera_file = "%s/tessera"%tessera_path
+    os.mkdir(tessera_path)
+    fin = open("%s/template"%self.tesserae, "r")
+    fout = open(tessera_file, "w")
     for line in fin.readlines( ):
       if line == "@title@\n":
         line = "%s\n"%title
@@ -126,78 +126,78 @@ class GitIssue:
     fin.close()
     fout.close()
 
-    p = Popen( ["sensible-editor", issue_file])
+    p = Popen( ["sensible-editor", tessera_file])
     p.communicate( )
     p.wait()
 
-    blocks = self.read_issue(issue_file)
+    blocks = self.read_tessera(tessera_file)
     if not blocks:
       return False
     title = self.get_title(blocks)
 
-    self.git.index.add([issue_file])
-    self.git.index.commit("new issue: %s"%title)
+    self.git.index.add([tessera_file])
+    self.git.index.commit("new tessera: %s"%title)
     return True
 
   def cmd_remove(self, args):
     if len(args) != 1:
-      stderr.write("git issue delete takes identifier as argument\n")
+      stderr.write("git tessera delete takes identifier as argument\n")
       return False
 
     key = args[0]
-    issue_file = None
-    for i in os.listdir(self.issues):
-      issue_path = "%s/%s"%(self.issues, i)
-      if not stat.S_ISDIR(os.lstat(issue_path).st_mode):
+    tessera_file = None
+    for i in os.listdir(self.tesserae):
+      tessera_path = "%s/%s"%(self.tesserae, i)
+      if not stat.S_ISDIR(os.lstat(tessera_path).st_mode):
         continue
       if i.split('-')[0] == key or i == key:
-        issue_file = "%s/issue"%issue_path
+        tessera_file = "%s/tessera"%tessera_path
         break
-    if not issue_file:
-      stderr.write("git issue %s not found\n"%key)
+    if not tessera_file:
+      stderr.write("git tessera %s not found\n"%key)
       return False
 
-    blocks = self.read_issue(issue_file)
+    blocks = self.read_tessera(tessera_file)
     if blocks:
       title = self.get_title(blocks)
     else:
       title = "no title"
 
-    stdout.write("remove issue %s: %s ? [Y/n] "%(key, title))
+    stdout.write("remove tessera %s: %s ? [Y/n] "%(key, title))
     try:
       answer = stdin.readline().strip()
     except KeyboardInterrupt:
       return False
     if not answer or answer.lower() == "y":
       from shutil import rmtree
-      rmtree(issue_path)
+      rmtree(tessera_path)
 
-      self.git.index.remove([issue_path], r = True)
-      self.git.index.commit("issue removed: %s"%title)
+      self.git.index.remove([tessera_path], r = True)
+      self.git.index.commit("tessera removed: %s"%title)
 
 
 
-  def read_issue(self, issue_file):
-    if not os.path.exists(issue_file):
-      stderr.write("issue file not found: %s\n"%issue_file)
+  def read_tessera(self, tessera_file):
+    if not os.path.exists(tessera_file):
+      stderr.write("tessera file not found: %s\n"%tessera_file)
       return None
 
-    f = open(issue_file, 'r')
+    f = open(tessera_file, 'r')
     blocks = f.read().split('\n\n')
     f.close()
     return blocks
 
-  def show_short(self, issue):
-    issue_file = "%s/issue"%issue
-    blocks = self.read_issue(issue_file)
+  def show_short(self, tessera):
+    tessera_file = "%s/tessera"%tessera
+    blocks = self.read_tessera(tessera_file)
     if blocks:
-      print self.get_ident_short(issue), colorful.bold_white(self.get_title(blocks))
+      print self.get_ident_short(tessera), colorful.bold_white(self.get_title(blocks))
 
-  def get_ident(self, issue):
-    return os.path.basename(issue)
+  def get_ident(self, tessera):
+    return os.path.basename(tessera)
 
-  def get_ident_short(self, issue):
-    return self.get_ident(issue).split('-')[0]
+  def get_ident_short(self, tessera):
+    return self.get_ident(tessera).split('-')[0]
 
   def get_title(self, blocks):
     RE = re.compile(r'^.*?\n[=-]+[ ]*(\n|$)', re.MULTILINE)
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     cmd = argv[1]
 
   try:
-    gi = GitIssue()
+    gi = GitTessera()
   except git.exc.InvalidGitRepositoryError:
     stderr.write("not a git repo\n")
     exit(1)

@@ -201,15 +201,15 @@ class GitTessera:
       return None
 
     f = open(tessera_file, 'r')
-    blocks = f.read().split('\n\n')
+    body = f.read()
     f.close()
-    return blocks
+    return body
 
   def show_short(self, tessera):
     tessera_file = "%s/tessera"%tessera
-    blocks = self.read_tessera(tessera_file)
-    if blocks:
-      print self.get_ident_short(tessera), colorful.bold_white(self.get_title(blocks))
+    body = self.read_tessera(tessera_file)
+    if body:
+      print self.get_ident_short(tessera), colorful.bold_white(self.get_title(body))
 
   def get_ident(self, tessera):
     return os.path.basename(tessera)
@@ -217,16 +217,12 @@ class GitTessera:
   def get_ident_short(self, tessera):
     return self.get_ident(tessera).split('-')[0]
 
-  def get_title(self, blocks):
-    RE = re.compile(r'^.*?\n[=-]+[ ]*(\n|$)', re.MULTILINE)
+  def get_title(self, body):
     title = "no title"
-    idx = 0
-    for block in blocks:
-      if RE.match(block):
-        title = block.split('\n')[0].strip()
-        blocks.pop(idx)
+    for line in body.split('\n'):
+      if line.startswith("# "):
+        title = line[2:]
         break
-      idx += 1
     return title
 
 if __name__ == "__main__":

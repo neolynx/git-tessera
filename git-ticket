@@ -72,7 +72,7 @@ class GitTessera:
     print ident_short, colorful.bold_white(title)
     print "=" * length
     print
-    print body
+    print '\n'.join(body)
     print
     return True
 
@@ -196,7 +196,7 @@ class GitTessera:
       return None
 
     f = open(tessera_file, 'r')
-    body = f.read()
+    body = f.read().split('\n')
     f.close()
     return body
 
@@ -214,9 +214,10 @@ class GitTessera:
 
   def get_title(self, body):
     title = "no title"
-    for line in body.split('\n'):
-      if line.startswith("# "):
-        title = line[2:]
+    for i in range(len(body)):
+      if body[i].startswith("# "):
+        title = body[i][2:]
+        body.pop(i)
         break
     return title
 

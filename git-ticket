@@ -63,18 +63,16 @@ class GitTessera:
       stderr.write("git tessera %s not found\n"%key)
       return False
 
-    f = open(tessera_file, 'r')
-    blocks = f.read().split('\n\n')
-    f.close()
+    body = self.read_tessera(tessera_file)
 
     ident_short = self.get_ident_short(tessera)
-    title = self.get_title(blocks)
+    title = self.get_title(body)
     length = len(ident_short) + len(title) + 2
     print "=" * length
     print ident_short, colorful.bold_white(title)
     print "=" * length
     print
-    print '\n\n'.join(blocks)
+    print body
     print
     return True
 
@@ -109,10 +107,10 @@ class GitTessera:
     p.wait()
 
     for tessera_file in tessera_files:
-      blocks = self.read_tessera(tessera_file)
-      if not blocks:
+      body = self.read_tessera(tessera_file)
+      if not body:
         continue
-      title = self.get_title(blocks)
+      title = self.get_title(body)
       self.git.index.add([tessera_file])
       self.git.index.commit("tessera updated: %s"%title)
     return True
@@ -148,10 +146,10 @@ class GitTessera:
     p.communicate( )
     p.wait()
 
-    blocks = self.read_tessera(tessera_file)
-    if not blocks:
+    body = self.read_tessera(tessera_file)
+    if not body:
       return False
-    title = self.get_title(blocks)
+    title = self.get_title(body)
 
     self.git.index.add([tessera_file])
     self.git.index.commit("new tessera: %s"%title)
@@ -175,11 +173,8 @@ class GitTessera:
       stderr.write("git tessera %s not found\n"%key)
       return False
 
-    blocks = self.read_tessera(tessera_file)
-    if blocks:
-      title = self.get_title(blocks)
-    else:
-      title = "no title"
+    body = self.read_tessera(tessera_file)
+    title = self.get_title(body)
 
     stdout.write("remove tessera %s: %s ? [Y/n] "%(key, title))
     try:

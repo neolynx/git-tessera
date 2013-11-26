@@ -3,6 +3,7 @@
 from sys import argv, stdin, stdout, stderr, exit
 from subprocess import check_output, Popen
 import os
+import shutil
 import stat
 import re
 import git
@@ -13,13 +14,29 @@ from colorful import colorful
 def cmp_tessera(a, b):
   aa = os.lstat("%s/tessera"%a)
   bb = os.lstat("%s/tessera"%b)
-  return aa.st_ctime < bb.st_ctime
+  return aa.st_mtime < bb.st_mtime
 
 class GitTessera:
   def __init__(self):
     self.git = git.Repo(".")
 
-    self.tesserae="%s/.tesserae"%self.git.working_dir
+    self.tesserae = "%s/.tesserae"%self.git.working_dir
+
+  def cmd_init(self, args):
+    if len(args) != 0:
+      stderr.write("git tessera init takes no arguments\n")
+      return False
+    if os.path.exists(self.tesserae):
+      stderr.write("git tesserae directory exists: %s\n"%self.tesserae)
+      return False
+    os.mkdir(self.tesserae)
+    template = "%s/template"%self.tesserae
+    shutil.copyfile("%s/template"%os.path.dirname(os.path.realpath(__file__)), template)
+    self.git.index.add([template])
+    self.git.index.commit("tessera initialized")
+    return True
+
+
 
   def cmd_ls(self, args):
     contents = [ self.tesserae + "/" + x for x in os.listdir(self.tesserae) if stat.S_ISDIR(os.lstat(self.tesserae + "/" + x).st_mode)]

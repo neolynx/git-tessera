@@ -117,9 +117,7 @@ class GitTessera:
     print "=" * length
     print ident_short, colorful.bold_white(title)
     print "=" * length
-    print
     print t.get_body()
-    print
     return True
 
 
@@ -198,7 +196,7 @@ class GitTessera:
       title = t.get_title()
 
       self.git.index.add([tessera_file])
-      self.git.index.commit("new tessera: %s"%title)
+      self.git.index.commit("tessera created: %s"%title)
     return True
 
   def cmd_remove(self, args):

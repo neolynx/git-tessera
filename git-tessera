@@ -22,6 +22,7 @@ class Tessera:
     self.filename = "%s/tessera"%tessera_path
     self.title = None
     self._read()
+    self._parse()
 
   def _read(self):
     if not os.path.exists(self.filename):
@@ -32,25 +33,22 @@ class Tessera:
     self.body = f.read().split('\n')
     f.close()
 
-  def show_short(self):
-    print self.get_ident_short(), colorful.bold_white(self.get_title())
-
-  def get_ident(self ):
-    return os.path.basename(self.tessera_path)
-
-  def get_ident_short(self):
-    return self.get_ident().split('-')[0]
-
-  def get_title(self):
-    if self.title:
-      return self.title
+  def _parse(self):
     self.title = "no title"
     for i in range(len(self.body)):
       if self.body[i].startswith("# "):
         self.title = self.body[i][2:]
         self.body.pop(i)
         break
-    return self.title
+
+  def show_short(self):
+    print self.get_ident_short(), colorful.bold_white(self.title)
+
+  def get_ident(self ):
+    return os.path.basename(self.tessera_path)
+
+  def get_ident_short(self):
+    return self.get_ident().split('-')[0]
 
   def get_body(self):
     return '\n'.join(self.body)
@@ -112,10 +110,9 @@ class GitTessera:
 
     t = Tessera(tessera_path)
     ident_short = t.get_ident_short()
-    title = t.get_title()
-    length = len(ident_short) + len(title) + 2
+    length = len(ident_short) + len(t.title) + 2
     print "=" * length
-    print ident_short, colorful.bold_white(title)
+    print ident_short, colorful.bold_white(t.title)
     print "=" * length
     print t.get_body()
     return True
@@ -156,9 +153,8 @@ class GitTessera:
     if self.git.is_dirty():
       for tessera_path in tessera_paths:
         t = Tessera(tessera_path)
-        title = t.get_title()
         self.git.index.add([tessera_file])
-        self.git.index.commit("tessera updated: %s"%title)
+        self.git.index.commit("tessera updated: %s"%t.title)
     return True
 
   def cmd_create(self, args):
@@ -193,10 +189,9 @@ class GitTessera:
 
     if self.git.is_dirty():
       t = Tessera(tessera_path)
-      title = t.get_title()
 
       self.git.index.add([tessera_file])
-      self.git.index.commit("tessera created: %s"%title)
+      self.git.index.commit("tessera created: %s"%t.title)
     return True
 
   def cmd_remove(self, args):
@@ -223,9 +218,8 @@ class GitTessera:
       return False
 
     t = Tessera(tessera_path)
-    title = t.get_title()
 
-    stdout.write("remove tessera %s: %s ? [Y/n] "%(key, title))
+    stdout.write("remove tessera %s: %s ? [Y/n] "%(key, t.title))
     try:
       answer = stdin.readline().strip()
     except KeyboardInterrupt:

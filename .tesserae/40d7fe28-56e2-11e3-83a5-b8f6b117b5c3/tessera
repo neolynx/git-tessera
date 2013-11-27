@@ -1,4 +1,5 @@
 # allow minimum unique id usage
+@status open
 
 if an id of 3d9 is unique,
 git show 3d9 should be enough, like

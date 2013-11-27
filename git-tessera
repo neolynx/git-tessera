@@ -187,11 +187,9 @@ class GitTessera:
     p.communicate( )
     p.wait()
 
-    if self.git.is_dirty():
-      t = Tessera(tessera_path)
-
-      self.git.index.add([tessera_file])
-      self.git.index.commit("tessera created: %s"%t.title)
+    t = Tessera(tessera_path)
+    self.git.index.add([tessera_file])
+    self.git.index.commit("tessera created: %s"%t.title)
     return True
 
   def cmd_remove(self, args):

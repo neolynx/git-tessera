@@ -1,4 +1,4 @@
-# implement issue status
+# implement issue status commands
 @status new
 
 add commands for handling issue status

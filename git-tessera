@@ -16,11 +16,53 @@ def cmp_tessera(a, b):
   bb = os.lstat("%s/tessera"%b)
   return aa.st_mtime < bb.st_mtime
 
+class Tessera:
+  def __init__(self, tessera_path):
+    self.tessera_path = tessera_path
+    self.filename = "%s/tessera"%tessera_path
+    self.title = None
+    self._read()
+
+  def _read(self):
+    if not os.path.exists(self.filename):
+      stderr.write("tessera file not found: %s\n"%self.fielname)
+      return None
+
+    f = open(self.filename, 'r')
+    self.body = f.read().split('\n')
+    f.close()
+
+  def show_short(self):
+    print self.get_ident_short(), colorful.bold_white(self.get_title())
+
+  def get_ident(self ):
+    return os.path.basename(self.tessera_path)
+
+  def get_ident_short(self):
+    return self.get_ident().split('-')[0]
+
+  def get_title(self):
+    if self.title:
+      return self.title
+    self.title = "no title"
+    for i in range(len(self.body)):
+      if self.body[i].startswith("# "):
+        self.title = self.body[i][2:]
+        self.body.pop(i)
+        break
+    return self.title
+
+  def get_body(self):
+    return '\n'.join(self.body)
+
+
 class GitTessera:
+
   def __init__(self):
     self.git = git.Repo(".")
 
     self.tesserae = "%s/.tesserae"%self.git.working_dir
+
 
   def cmd_init(self, args):
     if len(args) != 0:
@@ -33,17 +75,18 @@ class GitTessera:
     template = "%s/template"%self.tesserae
     shutil.copyfile("%s/template"%os.path.dirname(os.path.realpath(__file__)), template)
     self.git.index.add([template])
-    self.git.index.commit("tessera initialized")
+    self.git.index.commit("tessera: initialized")
     return True
-
 
 
   def cmd_ls(self, args):
     contents = [ self.tesserae + "/" + x for x in os.listdir(self.tesserae) if stat.S_ISDIR(os.lstat(self.tesserae + "/" + x).st_mode)]
     sorted(contents, cmp = cmp_tessera)
-    for tessera in contents:
-      self.show_short(tessera)
+    for tessera_path in contents:
+      t = Tessera(tessera_path)
+      t.show_short()
     return True
+
 
   def cmd_show(self, args):
     if len(args) != 1:
@@ -53,26 +96,24 @@ class GitTessera:
     key = args[0]
     tessera_file = None
     for i in os.listdir(self.tesserae):
-      tessera = "%s/%s"%(self.tesserae, i)
-      if not stat.S_ISDIR(os.lstat(tessera).st_mode):
+      tessera_path = "%s/%s"%(self.tesserae, i)
+      if not stat.S_ISDIR(os.lstat(tessera_path).st_mode):
         continue
       if i.split('-')[0] == key or i == key:
-        tessera_file = "%s/tessera"%tessera
         break
-    if not tessera_file:
+    if not tessera_path:
       stderr.write("git tessera %s not found\n"%key)
       return False
 
-    body = self.read_tessera(tessera_file)
-
-    ident_short = self.get_ident_short(tessera)
-    title = self.get_title(body)
+    t = Tessera(tessera_path)
+    ident_short = t.get_ident_short()
+    title = t.get_title()
     length = len(ident_short) + len(title) + 2
     print "=" * length
     print ident_short, colorful.bold_white(title)
     print "=" * length
     print
-    print '\n'.join(body)
+    print t.get_body()
     print
     return True
 
@@ -86,31 +127,32 @@ class GitTessera:
       stderr.write("repo is dirty\n")
       return False
 
+    tessera_paths = []
     tessera_files = []
     for key in args:
+      tessera_path = None
       tessera_file = None
       for i in os.listdir(self.tesserae):
-        tessera = "%s/%s"%(self.tesserae, i)
-        if not stat.S_ISDIR(os.lstat(tessera).st_mode):
+        tessera_path = "%s/%s"%(self.tesserae, i)
+        if not stat.S_ISDIR(os.lstat(tessera_path).st_mode):
           continue
         if i.split('-')[0] == key or i == key:
-          tessera_file = "%s/tessera"%tessera
+          tessera_file = "%s/tessera"%tessera_path
           break
       if not tessera_file:
         stder.write("git tessera %s not found\n"%key)
         return False
 
+      tessera_paths.append(tessera_path)
       tessera_files.append(tessera_file)
 
     p = Popen( ["sensible-editor"] + tessera_files )
     p.communicate( )
     p.wait()
 
-    for tessera_file in tessera_files:
-      body = self.read_tessera(tessera_file)
-      if not body:
-        continue
-      title = self.get_title(body)
+    for tessera_path in tessera_paths:
+      t = Tessera(tessera_path)
+      title = t.get_title()
       self.git.index.add([tessera_file])
       self.git.index.commit("tessera updated: %s"%title)
     return True
@@ -146,10 +188,8 @@ class GitTessera:
     p.communicate( )
     p.wait()
 
-    body = self.read_tessera(tessera_file)
-    if not body:
-      return False
-    title = self.get_title(body)
+    t = Tessera(tessera_path)
+    title = t.get_title()
 
     self.git.index.add([tessera_file])
     self.git.index.commit("new tessera: %s"%title)
@@ -162,6 +202,7 @@ class GitTessera:
 
     key = args[0]
     tessera_file = None
+    tessera_path = None
     for i in os.listdir(self.tesserae):
       tessera_path = "%s/%s"%(self.tesserae, i)
       if not stat.S_ISDIR(os.lstat(tessera_path).st_mode):
@@ -173,8 +214,8 @@ class GitTessera:
       stderr.write("git tessera %s not found\n"%key)
       return False
 
-    body = self.read_tessera(tessera_file)
-    title = self.get_title(body)
+    t = Tessera(tessera_path)
+    title = t.get_title()
 
     stdout.write("remove tessera %s: %s ? [Y/n] "%(key, title))
     try:
@@ -190,36 +231,6 @@ class GitTessera:
 
 
 
-  def read_tessera(self, tessera_file):
-    if not os.path.exists(tessera_file):
-      stderr.write("tessera file not found: %s\n"%tessera_file)
-      return None
-
-    f = open(tessera_file, 'r')
-    body = f.read().split('\n')
-    f.close()
-    return body
-
-  def show_short(self, tessera):
-    tessera_file = "%s/tessera"%tessera
-    body = self.read_tessera(tessera_file)
-    if body:
-      print self.get_ident_short(tessera), colorful.bold_white(self.get_title(body))
-
-  def get_ident(self, tessera):
-    return os.path.basename(tessera)
-
-  def get_ident_short(self, tessera):
-    return self.get_ident(tessera).split('-')[0]
-
-  def get_title(self, body):
-    title = "no title"
-    for i in range(len(body)):
-      if body[i].startswith("# "):
-        title = body[i][2:]
-        body.pop(i)
-        break
-    return title
 
 if __name__ == "__main__":
   cmd = "ls"
@@ -227,12 +238,12 @@ if __name__ == "__main__":
     cmd = argv[1]
 
   try:
-    gi = GitTessera()
+    t = GitTessera()
   except git.exc.InvalidGitRepositoryError:
     stderr.write("not a git repo\n")
     exit(1)
-  if hasattr(gi, "cmd_%s"%cmd):
-    if not getattr(gi, "cmd_%s"%cmd)(argv[2:]):
+  if hasattr(t, "cmd_%s"%cmd):
+    if not getattr(t, "cmd_%s"%cmd)(argv[2:]):
       exit( 1 )
     exit( 0 )
   else:

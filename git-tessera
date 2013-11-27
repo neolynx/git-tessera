@@ -178,8 +178,7 @@ class GitTessera:
     fout = open(tessera_file, "w")
     for line in fin.readlines( ):
       if line == "@title@\n":
-        line = "%s\n"%title
-        line += ("=" * (len(title) + 1)) + "\n"
+        line = "# %s\n"%title
       fout.write(line)
     fin.close()
     fout.close()
@@ -197,7 +196,7 @@ class GitTessera:
 
   def cmd_remove(self, args):
     if len(args) != 1:
-      stderr.write("git tessera delete takes identifier as argument\n")
+      stderr.write("git tessera remove takes identifier as argument\n")
       return False
 
     key = args[0]

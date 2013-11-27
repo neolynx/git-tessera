@@ -216,7 +216,6 @@ class GitTessera:
       return False
 
     t = Tessera(tessera_path)
-
     stdout.write("remove tessera %s: %s ? [Y/n] "%(key, t.title))
     try:
       answer = stdin.readline().strip()
@@ -227,7 +226,7 @@ class GitTessera:
       rmtree(tessera_path)
 
       self.git.index.remove([tessera_path], r = True)
-      self.git.index.commit("tessera removed: %s"%title)
+      self.git.index.commit("tessera removed: %s"%t.title)
 
 
 

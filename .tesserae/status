@@ -1,4 +1,4 @@
 new        green
 open       yellow
 done       bold_green
-obsolete   grey
+obsolete   white

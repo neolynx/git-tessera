@@ -170,24 +170,23 @@ class GitTessera:
       return False
 
     tessera_paths = []
-    tessera_files = []
     for key in args:
       tessera_path = None
-      tessera_file = None
+      found = False
       for i in os.listdir(Tessera._tesserae):
         tessera_path = "%s/%s"%(Tessera._tesserae, i)
         if not stat.S_ISDIR(os.lstat(tessera_path).st_mode):
           continue
         if i.split('-')[0] == key or i == key:
-          tessera_file = "%s/tessera"%tessera_path
+          found = True
           break
-      if not tessera_file:
+      if not found:
         stder.write("git tessera %s not found\n"%key)
         return False
 
       tessera_paths.append(tessera_path)
-      tessera_files.append(tessera_file)
 
+    tessera_files = [ "%s/tessera"%x for x in tessera_paths ]
     p = Popen( ["sensible-editor"] + tessera_files )
     p.communicate( )
     p.wait()
@@ -195,7 +194,7 @@ class GitTessera:
     if self.git.is_dirty():
       for tessera_path in tessera_paths:
         t = Tessera(tessera_path)
-        self.git.index.add([tessera_file])
+        self.git.index.add(["%s/tessera"%tessera_path])
         self.git.index.commit("tessera updated: %s"%t.title)
     return True
 

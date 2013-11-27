@@ -68,8 +68,13 @@ class GitTessera:
     if len(args) != 0:
       stderr.write("git tessera init takes no arguments\n")
       return False
+
+    if self.git.is_dirty():
+      stderr.write("repo is dirty\n")
+      return False
+
     if os.path.exists(self.tesserae):
-      stderr.write("git tesserae directory exists: %s\n"%self.tesserae)
+      stderr.write("git tesserae directory already exists: %s\n"%self.tesserae)
       return False
     os.mkdir(self.tesserae)
     template = "%s/template"%self.tesserae
@@ -150,11 +155,12 @@ class GitTessera:
     p.communicate( )
     p.wait()
 
-    for tessera_path in tessera_paths:
-      t = Tessera(tessera_path)
-      title = t.get_title()
-      self.git.index.add([tessera_file])
-      self.git.index.commit("tessera updated: %s"%title)
+    if self.git.is_dirty():
+      for tessera_path in tessera_paths:
+        t = Tessera(tessera_path)
+        title = t.get_title()
+        self.git.index.add([tessera_file])
+        self.git.index.commit("tessera updated: %s"%title)
     return True
 
   def cmd_create(self, args):
@@ -187,16 +193,21 @@ class GitTessera:
     p.communicate( )
     p.wait()
 
-    t = Tessera(tessera_path)
-    title = t.get_title()
+    if self.git.is_dirty():
+      t = Tessera(tessera_path)
+      title = t.get_title()
 
-    self.git.index.add([tessera_file])
-    self.git.index.commit("new tessera: %s"%title)
+      self.git.index.add([tessera_file])
+      self.git.index.commit("new tessera: %s"%title)
     return True
 
   def cmd_remove(self, args):
     if len(args) != 1:
       stderr.write("git tessera remove takes identifier as argument\n")
+      return False
+
+    if self.git.is_dirty():
+      stderr.write("repo is dirty\n")
       return False
 
     key = args[0]

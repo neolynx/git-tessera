@@ -6,7 +6,7 @@ import os
 import shutil
 import stat
 import re
-import git
+import pygit2
 from uuid import uuid1
 
 from colorful import colorful
@@ -94,8 +94,9 @@ class Tessera:
 class GitTessera:
 
   def __init__(self):
-    self.git = git.Repo(".")
-    Tessera._tesserae = "%s/.tesserae"%self.git.working_dir
+    self.gitdir = "."
+    self.git = pygit2.Repository(self.gitdir)
+    Tessera._tesserae = "%s/.tesserae"%self.gitdir
 
 
   def cmd_init(self, args):
@@ -103,24 +104,25 @@ class GitTessera:
       stderr.write("git tessera init takes no arguments\n")
       return False
 
-    if self.git.is_dirty():
-      stderr.write("repo is dirty\n")
-      return False
+    #if self.git.is_dirty():
+      #stderr.write("repo is dirty\n")
+      #return False
 
     if os.path.exists(Tessera._tesserae):
       stderr.write("git tesserae directory already exists: %s\n"%Tessera._tesserae)
       return False
     os.mkdir(Tessera._tesserae)
 
+    files = []
     t = "%s/template"%Tessera._tesserae
     shutil.copyfile("%s/template"%os.path.dirname(os.path.realpath(__file__)), t)
-    self.git.index.add([t])
+    files.append(t)
 
     t = "%s/status"%Tessera._tesserae
     shutil.copyfile("%s/status"%os.path.dirname(os.path.realpath(__file__)), t)
-    self.git.index.add([t])
+    files.append(t)
 
-    self.git.index.commit("tessera: initialized")
+    self.git_add(files, "tessera: initialized")
     return True
 
 
@@ -170,9 +172,9 @@ class GitTessera:
       stderr.write("git tessera edit takes one or more identifier as argument\n")
       return False
 
-    if self.git.is_dirty():
-      stderr.write("repo is dirty\n")
-      return False
+    #if self.git.is_dirty():
+      #stderr.write("repo is dirty\n")
+      #return False
 
     tessera_paths = []
     for key in args:
@@ -196,11 +198,10 @@ class GitTessera:
     p.communicate( )
     p.wait()
 
-    if self.git.is_dirty():
-      for tessera_path in tessera_paths:
-        t = Tessera(tessera_path)
-        self.git.index.add(["%s/tessera"%tessera_path])
-        self.git.index.commit("tessera updated: %s"%t.title)
+    #if self.git.is_dirty():
+    for tessera_path in tessera_paths:
+      t = Tessera(tessera_path)
+      self.git_add(["%s/tessera"%tessera_path], "tessera updated: %s"%t.title)
     return True
 
   def cmd_create(self, args):
@@ -208,9 +209,9 @@ class GitTessera:
       stderr.write("git tessera create needs arguments\n")
       return False
 
-    if self.git.is_dirty():
-      stderr.write("repo is dirty\n")
-      return False
+    #if self.git.is_dirty():
+    #  stderr.write("repo is dirty\n")
+    #  return False
 
     if args:
       title = " ".join(args)
@@ -234,8 +235,7 @@ class GitTessera:
     p.wait()
 
     t = Tessera(tessera_path)
-    self.git.index.add([tessera_file])
-    self.git.index.commit("tessera created: %s"%t.title)
+    self.git_add([tessera_file], "tessera created: %s"%t.title)
     return True
 
   def cmd_remove(self, args):
@@ -243,9 +243,9 @@ class GitTessera:
       stderr.write("git tessera remove takes identifier as argument\n")
       return False
 
-    if self.git.is_dirty():
-      stderr.write("repo is dirty\n")
-      return False
+    #if self.git.is_dirty():
+      #stderr.write("repo is dirty\n")
+      #return False
 
     key = args[0]
     tessera_file = None
@@ -268,13 +268,47 @@ class GitTessera:
     except KeyboardInterrupt:
       return False
     if not answer or answer.lower() == "y":
+      files = [ "%s/%s"%(tessera_path, x) for x in os.listdir(tessera_path)]
+      self.git_rm(files, "tessera removed: %s"%t.title)
+
       from shutil import rmtree
       rmtree(tessera_path)
 
-      self.git.index.remove([tessera_path], r = True)
-      self.git.index.commit("tessera removed: %s"%t.title)
 
+  def git_add(self, files, message):
+    self.git.index.read()
+    head = self.git.head.get_object().hex
 
+    for filename in files:
+      filename = os.path.relpath(filename)
+      self.git.index.add(filename)
+
+    self.git.index.write()
+    oid = self.git.index.write_tree()
+    self.git.create_commit('refs/heads/master',
+                    pygit2.Signature('Alice Author', 'alice@authors.tld'),
+                    pygit2.Signature('Cecil Committer', 'cecil@committers.tld'),
+                    message,
+                    oid,
+                    [head]
+                   )
+
+  def git_rm(self, files, message):
+    self.git.index.read()
+    head = self.git.head.get_object().hex
+
+    for filename in files:
+      self.git.index.remove(os.path.relpath(filename))
+
+    self.git.index.write()
+    oid = self.git.index.write_tree()
+    self.git.create_commit('refs/heads/master',
+                    pygit2.Signature('Alice Author', 'alice@authors.tld'),
+                    pygit2.Signature('Cecil Committer', 'cecil@committers.tld'),
+                    message,
+                    oid,
+                    [head]
+                   )
 
 
 if __name__ == "__main__":
@@ -282,11 +316,11 @@ if __name__ == "__main__":
   if len(argv) > 1:
     cmd = argv[1]
 
-  try:
-    t = GitTessera()
-  except git.exc.InvalidGitRepositoryError:
-    stderr.write("not a git repo\n")
-    exit(1)
+  #try:
+  t = GitTessera()
+  #except git.exc.InvalidGitRepositoryError:
+    #stderr.write("not a git repo\n")
+    #exit(1)
   if hasattr(t, "cmd_%s"%cmd):
     if not getattr(t, "cmd_%s"%cmd)(argv[2:]):
       exit( 1 )

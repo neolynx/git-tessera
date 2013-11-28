@@ -4,11 +4,11 @@
 from imp import load_source
 from setuptools import setup
 
-radish_version = load_source("version", "tessera/version.py")
+tessera_version = load_source("version", "tessera/version.py")
 
 setup(
-    name="radish-bdd",
-    version=radish_version.__version__,
+    name="git-tessera",
+    version=tessera_version.__version__,
     license="GPL",
     description="manage your issues in your repository",
     author="AndrÃ© Roth, Claudio Klingler",
@@ -20,7 +20,7 @@ setup(
     download_url="https://github.com/neolynx/git-tessera.git",
     packages=["tessera"],
     entry_points={"console_scripts": ["git-tessera = tessera.main:main"]},
-    package_data={"radish": ["tessera"]},
+    package_data={"tessera": ["tessera"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",

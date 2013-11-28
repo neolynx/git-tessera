@@ -1,0 +1,4 @@
+# sort by status
+@status new
+
+sort by status as order in status file

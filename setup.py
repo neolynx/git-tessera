@@ -4,26 +4,23 @@
 from imp import load_source
 from setuptools import setup
 
-radish_version = load_source("version", "radish/version.py")
+radish_version = load_source("version", "tessera/version.py")
 
 setup(
     name="radish-bdd",
     version=radish_version.__version__,
     license="GPL",
-    description="Behaviour-Driven-Development tool for python",
-    author="Timo Furrer",
-    author_email="tuxtimo@gmail.com",
-    maintainer="Timo Furrer",
-    maintainer_email="tuxtimo@gmail.com",
+    description="manage your issues in your repository",
+    author="AndrÃ© Roth, Claudio Klingler",
+    author_email="neolynx@gmail.com",
+    maintainer="AndrÃ© Roth",
+    maintainer_email="neolynx@gmail.com",
     platforms=["Linux", "Windows", "MAC OS X"],
-    url="http://github.com/timofurrer/radish",
-    download_url="http://github.com/timofurrer/radish",
-    #install_requires=["docopt==0.6.1", "lxml==3.2.1"],
-    install_requires=["docopt==0.6.1"],
-    package_dir={"radish.singleton": "radish/pysingleton/singleton"},
-    packages=["radish", "radish.singleton"],
-    entry_points={"console_scripts": ["radish = radish.main:main"]},
-    package_data={"radish": ["*.md"]},
+    url="https://github.com/neolynx/git-tessera.git",
+    download_url="https://github.com/neolynx/git-tessera.git",
+    packages=["tessera"],
+    entry_points={"console_scripts": ["git-tessera = tessera.main:main"]},
+    package_data={"radish": ["tessera"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",

@@ -20,7 +20,7 @@ setup(
     download_url="https://github.com/neolynx/git-tessera.git",
     packages=["tessera"],
     entry_points={"console_scripts": ["git-tessera = tessera.main:main"]},
-    package_data={"tessera": ["tessera"]},
+    package_data={ "tessera": ["**/tessera"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",

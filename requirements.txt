@@ -1,1 +1,2 @@
 distribute==0.6.24
+gittle==0.2.2

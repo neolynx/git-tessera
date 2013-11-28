@@ -6,7 +6,7 @@ import os
 import shutil
 import stat
 import re
-import pygit2
+from gittle import Gittle
 from uuid import uuid1
 
 from colorful import colorful
@@ -95,7 +95,7 @@ class GitTessera:
 
   def __init__(self):
     self.gitdir = "."
-    self.git = pygit2.Repository(self.gitdir)
+    self.git = Gittle(self.gitdir)
     Tessera._tesserae = "%s/.tesserae"%self.gitdir
 
 
@@ -276,40 +276,12 @@ class GitTessera:
 
 
   def git_add(self, files, message):
-    self.git.index.read()
-    head = self.git.head.get_object().hex
-
-    for filename in files:
-      filename = os.path.relpath(filename)
-      self.git.index.add(filename)
-
-    self.git.index.write()
-    oid = self.git.index.write_tree()
-    self.git.create_commit('refs/heads/master',
-                    pygit2.Signature('Alice Author', 'alice@authors.tld'),
-                    pygit2.Signature('Cecil Committer', 'cecil@committers.tld'),
-                    message,
-                    oid,
-                    [head]
-                   )
+    self.git.stage(files)
+    self.git.commit(message=message)
 
   def git_rm(self, files, message):
-    self.git.index.read()
-    head = self.git.head.get_object().hex
-
-    for filename in files:
-      self.git.index.remove(os.path.relpath(filename))
-
-    self.git.index.write()
-    oid = self.git.index.write_tree()
-    self.git.create_commit('refs/heads/master',
-                    pygit2.Signature('Alice Author', 'alice@authors.tld'),
-                    pygit2.Signature('Cecil Committer', 'cecil@committers.tld'),
-                    message,
-                    oid,
-                    [head]
-                   )
-
+    self.git.rm(files)
+    self.git.commit(message=message)
 
 def main():
   cmd = "ls"

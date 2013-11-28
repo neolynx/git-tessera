@@ -1,0 +1,4 @@
+# ignore dirty submodules
+@status new
+
+if a git repo has submodules, do not fail if they are dirty

@@ -1,0 +1,4 @@
+# only add changed files
+@status new
+
+only add files to git if they are modified

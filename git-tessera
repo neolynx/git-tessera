@@ -125,6 +125,11 @@ class GitTessera:
 
 
   def cmd_ls(self, args):
+    # FIXME: check args
+    if not os.path.exists(Tessera._tesserae):
+      stderr.write("git tesserae directory does not exist\n")
+      return False
+
     contents = [ Tessera._tesserae + "/" + x for x in os.listdir(Tessera._tesserae) if stat.S_ISDIR(os.lstat(Tessera._tesserae + "/" + x).st_mode)]
     sorted(contents, cmp = cmp_tessera)
     for tessera_path in contents:

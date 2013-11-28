@@ -12,20 +12,24 @@ class Tessera:
         self._read()
         self._parse()
 
-        if not Tessera._status:
-            status_file = "%s/status"%Tessera._tesserae
-            if os.path.exists(status_file): # FIXME: else set _status False and dont come back
-            f = open(status_file, 'r')
-            for line in f.readlines():
-                line = line.strip()
-                if line:
-                    a = re.split(r'[ \t]+', line)
-                    if len(a) != 2:
-                        print "invalid status line: %s"%line
-                        break
-                Tessera._status.append( ( a[0], a[1] ) )
-                f.close()
+        if Tessera._status:
+            return
 
+        status_file = "%s/status" % Tessera._tesserae
+        if not os.path.exists(status_file):
+            Tessera._status = False
+            return
+
+        f = open(status_file, 'r')
+        for line in f.readlines():
+            line = line.strip()
+            if line:
+                a = re.split(r'[ \t]+', line)
+                if len(a) != 2:
+                    print "invalid status line: %s"%line
+                    break
+                Tessera._status.append( ( a[0], a[1] ) )
+        f.close()
 
     def _read(self):
         if not os.path.exists(self.filename):

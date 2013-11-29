@@ -1,5 +1,8 @@
+import os
+import stat
+
 from gittle import Gittle
-from tessara import Tessara
+from te import Tessera
 
 class GitTessera:
 
@@ -7,23 +10,23 @@ class GitTessera:
     def __init__(self):
         self.gitdir = "."
         self.git = Gittle(self.gitdir)
-        Tessera._tesserae = "%s/.tesserae"  %self.gitdir
+        self.tesserae = "%s/.tesserae"  % self.gitdir
 
 
     def init(self, args = []):
         if len(args) != 0:
-        return False
+            return False
 
-        if os.path.exists(Tessera._tesserae):
-        return False
-        os.mkdir(Tessera._tesserae)
+        if os.path.exists(self.tesserae):
+            return False
+        os.mkdir(self.tesserae)
 
         files = []
-        t = "%s/template" % Tessera._tesserae
+        t = "%s/template" % self.tesserae
         shutil.copyfile("%s/template" % os.path.dirname(os.path.realpath(__file__)), t)
         files.append(t)
 
-        t = "%s/status" % Tessera._tesserae
+        t = "%s/status" % self.tesserae
         shutil.copyfile("%s/status" % os.path.dirname(os.path.realpath(__file__)), t)
         files.append(t)
 
@@ -32,10 +35,10 @@ class GitTessera:
 
     def ls(self, args = []):
         # FIXME: check args
-        if not os.path.exists(Tessera._tesserae):
+        if not os.path.exists(self.tesserae):
             return False
 
-        contents = [ Tessera._tesserae + "/" + x for x in os.listdir(Tessera._tesserae) if stat.S_ISDIR(os.lstat(Tessera._tesserae + "/" + x).st_mode)]
+        contents = [ self.tesserae + "/" + x for x in os.listdir(self.tesserae) if stat.S_ISDIR(os.lstat(self.tesserae + "/" + x).st_mode)]
         sorted(contents, cmp = cmp_tessera)
         tesserae = []
         for tessera_path in contents:

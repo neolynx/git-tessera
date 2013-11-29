@@ -2,9 +2,7 @@
 
 from sys import argv, stdin, stdout, stderr, exit
 from subprocess import check_output, Popen
-import os
 import shutil
-import stat
 import re
 from gittle import Gittle
 from gittessera import GitTessera
@@ -22,8 +20,8 @@ def main():
   #except git.exc.InvalidGitRepositoryError:
     #stderr.write("not a git repo\n")
     #exit(1)
-  if hasattr(t, "cmd_%s"%cmd):
-    if not getattr(t, "cmd_%s"%cmd)(argv[2:]):
+  if hasattr(t, cmd):
+    if not getattr(t, cmd)(argv[2:]):
       exit( 1 )
     exit( 0 )
   else:

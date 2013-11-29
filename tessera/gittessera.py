@@ -6,35 +6,12 @@ from te import Tessera
 
 class GitTessera:
 
-
     def __init__(self):
         self.gitdir = "."
         self.git = Gittle(self.gitdir)
         self.tesserae = "%s/.tesserae"  % self.gitdir
 
-
-    def init(self, args = []):
-        if len(args) != 0:
-            return False
-
-        if os.path.exists(self.tesserae):
-            return False
-        os.mkdir(self.tesserae)
-
-        files = []
-        t = "%s/template" % self.tesserae
-        shutil.copyfile("%s/template" % os.path.dirname(os.path.realpath(__file__)), t)
-        files.append(t)
-
-        t = "%s/status" % self.tesserae
-        shutil.copyfile("%s/status" % os.path.dirname(os.path.realpath(__file__)), t)
-        files.append(t)
-
-        return self.git_add(files, "tessera: initialized")
-
-
     def ls(self, args = []):
-        tes = se
         # FIXME: check args
         if not os.path.exists(self.tesserae):
             return False

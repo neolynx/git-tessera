@@ -28,4 +28,3 @@ def _cmp_tessera(a, b):
   bb = os.lstat("%s/tessera"%b)
   return aa.st_mtime < bb.st_mtime
 
-

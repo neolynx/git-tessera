@@ -1,5 +1,8 @@
 import os
 import stat
+from uuid import uuid1
+from subprocess import check_output, Popen
+from sys import stdin, stdout, stderr
 
 from te import Tessera
 from gittessera import GitTessera
@@ -10,7 +13,7 @@ class TesseraCommands:
     def __init__(self):
         self.gitdir = "."
         self.git = Gittle(self.gitdir)
-        Tessera._tesserae = "%s/.tesserae"%self.gitdir
+        Tessera._tesserae = os.path.relpath("%s/.tesserae" % self.gitdir)
 
 
     def cmd_init(self, args):
@@ -80,10 +83,6 @@ class TesseraCommands:
             stderr.write("git tessera edit takes one or more identifier as argument\n")
             return False
 
-        #if self.git.is_dirty():
-            #stderr.write("repo is dirty\n")
-            #return False
-
         tessera_paths = []
         for key in args:
             tessera_path = None
@@ -101,7 +100,7 @@ class TesseraCommands:
 
             tessera_paths.append(tessera_path)
 
-        tessera_files = [ "%s/tessera"%x for x in tessera_paths ]
+        tessera_files = [ "%s/tessera" % x for x in tessera_paths ]
         p = Popen( ["sensible-editor"] + tessera_files )
         p.communicate( )
         p.wait()
@@ -109,7 +108,7 @@ class TesseraCommands:
         #if self.git.is_dirty():
         for tessera_path in tessera_paths:
             t = Tessera(tessera_path)
-            self.git_add(["%s/tessera"%tessera_path], "tessera updated: %s"%t.title)
+            self.git_add(["%s/tessera" % tessera_path], "tessera updated: %s"%t.title)
         return True
 
     def cmd_create(self, args):
@@ -184,7 +183,9 @@ class TesseraCommands:
 
 
     def git_add(self, files, message):
-        self.git.stage(files)
+        for tessera in files:
+            stderr.write("staging %s" % tessera)
+            self.git.stage(tessera)
         self.git.commit(message=message)
 
     def git_rm(self, files, message):

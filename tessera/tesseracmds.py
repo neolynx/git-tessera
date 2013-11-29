@@ -108,7 +108,7 @@ class TesseraCommands:
         #if self.git.is_dirty():
         for tessera_path in tessera_paths:
             t = Tessera(tessera_path)
-            self.git_add(["%s/tessera" % tessera_path], "tessera updated: %s"%t.title)
+            self.git_add("%s/tessera" % tessera_path, "tessera updated: %s"%t.title)
         return True
 
     def cmd_create(self, args):
@@ -142,7 +142,7 @@ class TesseraCommands:
         p.wait()
 
         t = Tessera(tessera_path)
-        self.git_add([tessera_file], "tessera created: %s"%t.title)
+        self.git_add(tessera_file, "tessera created: %s"%t.title)
         return True
 
     def cmd_remove(self, args):
@@ -183,10 +183,8 @@ class TesseraCommands:
 
 
     def git_add(self, files, message):
-        for tessera in files:
-            stderr.write("staging %s" % tessera)
-            self.git.stage(tessera)
-        self.git.commit(message=message)
+        stderr.write("staging %s" % files)
+        self.git.commit(message=message, files=files)
 
     def git_rm(self, files, message):
         self.git.rm(files)

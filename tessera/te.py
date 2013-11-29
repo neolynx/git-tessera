@@ -16,7 +16,7 @@ class Tessera:
         self._read()
         self._parse()
 
-        if Tessera._status:
+        if self._status:
             return
 
         status_file = "%s/status" % Tessera._tesserae

@@ -7,6 +7,7 @@ from sys import stdin, stdout, stderr
 from te import Tessera
 from gittessera import GitTessera
 from gittle import Gittle
+import shutil
 
 class TesseraCommands:
 

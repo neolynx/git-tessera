@@ -62,16 +62,22 @@ class Tessera:
     def summary(self):
         l = len(self.title)
         color = None
-        for s in Tessera._status:
-            if s[0] == self.status:
-                color = s[1]
-                break
-        status = self.status
+        if Tessera._status:
+            for s in Tessera._status:
+                if s[0] == self.status:
+                    color = s[1]
+                    break
+            status = self.status
+        else:
+            status = "no status available"
         if color:
             if hasattr(colorful, color):
                 f = getattr(colorful, color)
                 status = f(self.status)
-                return "%s %s %s %s"%(self.get_ident_short(), colorful.bold_white(self.title), " " * (40 - l), status)
+        return "%s %s %s %s"%(self.get_ident_short(), colorful.bold_white(self.title), " " * (40 - l), status)
+
+    def data(self):
+        return ( self.get_ident(), self.get_body() )
 
     def get_ident(self ):
         return os.path.basename(self.tessera_path)

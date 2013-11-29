@@ -21,7 +21,9 @@ setup(
     install_requires=["gittle==0.2.2"],
     packages=["tessera"],
     entry_points={"console_scripts": ["git-tessera = tessera.main:main"]},
-    package_data={ "tessera": ["**/tessera"]},
+    package_dir={'git-tessera': 'tessera'},
+    package_data={ "git-tessera": ["status", "template"]},
+    include_package_data=True,
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",

@@ -1,3 +1,3 @@
-include README.rst
-include template
-include status
+include README.md
+include tessera/template
+include tessera/status

@@ -1,8 +1,8 @@
-# editing ticket without changes creates empty commit
+# do nots create empty commits
 @status new
 @type bug
 
-1. do a 
+1. do a
     ```
     git tessera edit <id>
     ```

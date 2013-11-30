@@ -1,0 +1,11 @@
+# editing ticket without changes creates empty commit
+@status new
+@type bug
+
+1. do a 
+    ```
+    git tessera edit <id>
+    ```
+2. leave editor without changes
+
+Then tessera creates an empty commit.

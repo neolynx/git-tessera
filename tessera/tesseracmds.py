@@ -186,6 +186,10 @@ class TesseraCommands:
             from shutil import rmtree
             rmtree(tessera_path)
 
+    def cmd_serve(self, args):
+      from TesseraWeb import TesseraWeb
+      web = TesseraWeb()
+      web.serve()
 
     def git_add(self, files, message):
         stderr.write("staging %s" % files)

@@ -33,11 +33,11 @@ class TesseraCommands:
 
         files = []
         t = "%s/template"%Tessera._tesserae
-        shutil.copyfile("%s/template"%os.path.dirname(os.path.realpath(__file__)), t)
+        shutil.copyfile("%s/config/template"%os.path.dirname(os.path.realpath(__file__)), t)
         files.append(t)
 
         t = "%s/status"%Tessera._tesserae
-        shutil.copyfile("%s/status"%os.path.dirname(os.path.realpath(__file__)), t)
+        shutil.copyfile("%s/config/status"%os.path.dirname(os.path.realpath(__file__)), t)
         files.append(t)
 
         self.git_add(files, "tessera: initialized")

@@ -4,12 +4,12 @@ from uuid import uuid1
 from subprocess import check_output, Popen
 from sys import stdin, stdout, stderr
 
-from te import Tessera
-from gittessera import GitTessera
+from Tessera import Tessera
+from GitTessera import GitTessera
 from gittle import Gittle
 import shutil
 
-class TesseraCommands:
+class GitCommands:
 
     def __init__(self):
         self.gitdir = "."

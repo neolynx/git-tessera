@@ -5,14 +5,9 @@ import os
 import shutil
 import stat
 from gittle import Gittle
-from tesseracmds import TesseraCommands
+from GitCommands import GitCommands
 
 from colorful import colorful
-
-def cmp_tessera(a, b):
-  aa = os.lstat("%s/tessera"%a)
-  bb = os.lstat("%s/tessera"%b)
-  return aa.st_mtime < bb.st_mtime
 
 def main():
   cmd = "ls"
@@ -20,7 +15,7 @@ def main():
     cmd = argv[1]
 
   #try:
-  t = TesseraCommands()
+  t = GitCommands()
   #except git.exc.InvalidGitRepositoryError:
     #stderr.write("not a git repo\n")
     #exit(1)

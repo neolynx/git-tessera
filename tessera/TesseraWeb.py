@@ -2,7 +2,7 @@ import web
 import markdown
 import sys
 from os import path
-from gittessera import GitTessera
+from GitTessera import GitTessera
 
 render = web.template.render('%s/web'%path.dirname(path.realpath(__file__)))
 

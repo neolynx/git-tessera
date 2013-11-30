@@ -2,7 +2,7 @@ import os
 import stat
 
 from gittle import Gittle
-from te import Tessera
+from Tessera import Tessera
 
 class GitTessera:
 

@@ -1,4 +1,4 @@
-# do not show done tesserae with git tessera
+# ls: filter output
 @status new
 @type feature
 

@@ -1,0 +1,6 @@
+# do not show done tesserae with git tessera
+@status new
+@type feature
+
+'git tessera' shall not show tesserae which have
+status 'done'.

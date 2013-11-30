@@ -4,7 +4,7 @@ import re
 from gittle import Gittle
 from colorful import colorful
 
-class Tessera:
+class Tessera(object):
     _tesserae = None
     _status = {}
     _te_types = {}

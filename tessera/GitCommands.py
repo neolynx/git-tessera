@@ -9,7 +9,7 @@ from GitTessera import GitTessera
 from gittle import Gittle
 import shutil
 
-class GitCommands:
+class GitCommands(object):
 
     def __init__(self):
         self.gitdir = "."

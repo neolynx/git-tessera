@@ -4,7 +4,7 @@ import stat
 from gittle import Gittle
 from Tessera import Tessera
 
-class GitTessera:
+class GitTessera(object):
 
     def __init__(self):
         self.gitdir = "."

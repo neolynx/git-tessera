@@ -6,7 +6,7 @@ from GitTessera import GitTessera
 
 render = web.template.render('%s/web'%path.dirname(path.realpath(__file__)))
 
-class TesseraWeb:
+class TesseraWeb(object):
   def __init__(self):
     self.urls = ('/', 'index',
                  '/tessera.css', 'css')
@@ -16,7 +16,7 @@ class TesseraWeb:
     app = web.application(self.urls, globals())
     app.run()
 
-class index:
+class index(object):
   def GET(self):
     html = ""
     gt = GitTessera()

@@ -1,6 +1,6 @@
 # allow minimum unique id usage
 @status new
-@type whishlist
+@type wishlist
 
 if an id of 3d9 is unique,
 git show 3d9 should be enough, like

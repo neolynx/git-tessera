@@ -1,3 +1,4 @@
 include README.md
 include tessera/config/template
 include tessera/config/status
+include tessera/config/types

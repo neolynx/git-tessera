@@ -22,7 +22,7 @@ setup(
     packages=["tessera"],
     entry_points={"console_scripts": ["git-tessera = tessera.main:main"]},
     package_dir={'git-tessera': 'tessera/config'},
-    package_data={ "git-tessera": ["status", "template"]},
+    package_data={ "git-tessera": ["status", "template", "config"]},
     include_package_data=True,
     classifiers=[
         "Development Status :: 4 - Beta",

@@ -1,5 +1,5 @@
 # only add changed files
-@status new
+@status obsolete
 @type bug
 
 only add files to git if they are modified

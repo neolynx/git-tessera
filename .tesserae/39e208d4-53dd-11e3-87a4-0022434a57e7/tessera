@@ -1,5 +1,5 @@
 # add template support
-@status new
+@status done
 @type todo
 
 provide template per issue type

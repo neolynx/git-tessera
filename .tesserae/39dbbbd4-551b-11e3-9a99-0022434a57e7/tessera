@@ -1,4 +1,5 @@
 # add status
 @status done
+@type todo
 
 implement @status tag

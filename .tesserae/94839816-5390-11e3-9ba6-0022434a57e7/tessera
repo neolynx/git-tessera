@@ -1,4 +1,5 @@
 # implement issue status commands
 @status new
+@type todo
 
 add commands for handling issue status

@@ -1,4 +1,5 @@
 # synchronize seq file
 @status obsolete
+@type todo
 
 before editing the issue, maybe sync the seq file with origin ?

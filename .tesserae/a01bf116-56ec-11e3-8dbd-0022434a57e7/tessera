@@ -1,4 +1,5 @@
 # implement vim plugin
 @status open
+@type todo
 
 create a nice vim integration

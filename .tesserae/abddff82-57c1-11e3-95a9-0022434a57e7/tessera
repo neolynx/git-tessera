@@ -1,4 +1,5 @@
 # sort by status
 @status new
+@type todo
 
 sort by status as order in status file

@@ -1,4 +1,5 @@
 # tab completion
 @status new
+@type todo
 
 add tab completion for arguments

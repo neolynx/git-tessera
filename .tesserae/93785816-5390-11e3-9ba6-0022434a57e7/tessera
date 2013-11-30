@@ -1,4 +1,5 @@
 # add tags
 @status new
+@type todo
 
 add a tag list to the issues

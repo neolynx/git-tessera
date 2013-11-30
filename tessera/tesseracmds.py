@@ -40,6 +40,10 @@ class TesseraCommands:
         shutil.copyfile("%s/config/status"%os.path.dirname(os.path.realpath(__file__)), t)
         files.append(t)
 
+        t = "%s/types"%Tessera._tesserae
+        shutil.copyfile("%s/config/types"%os.path.dirname(os.path.realpath(__file__)), t)
+        files.append(t)
+
         self.git_add(files, "tessera: initialized")
         return True
 

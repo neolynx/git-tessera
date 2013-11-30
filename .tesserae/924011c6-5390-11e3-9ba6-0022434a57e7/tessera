@@ -1,4 +1,5 @@
 # hide commit output
 @status obsolete
+@type todo
 
 instead of commit output, show a nice status message

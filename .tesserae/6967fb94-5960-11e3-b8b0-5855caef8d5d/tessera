@@ -1,4 +1,4 @@
-# do nots create empty commits
+# do not create empty commits
 @status new
 @type bug
 

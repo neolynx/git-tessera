@@ -76,8 +76,9 @@ class Tessera:
                 status = f(self.status)
         return "%s %s %s %s"%(self.get_ident_short(), colorful.bold_white(self.title), " " * (40 - l), status)
 
-    def data(self):
-        return ( self.get_ident(), self.get_body() )
+    def ident(self):
+        return dict(ident=self.get_ident(), title=self.title, filename=self.filename, body=self.get_body())
+
 
     def get_ident(self ):
         return os.path.basename(self.tessera_path)

@@ -72,31 +72,41 @@ class Tessera(object):
         f.close()
 
     def _parse(self):
-        self.title = None
-        self.status = None
-        self.tags = []
-        i = 0
-        while i < len(self.body):
-            if self.body[i].startswith("# "):
-                self.title = self.body[i][2:].strip()
-                self.body.pop(i)
-            elif self.body[i].startswith("@status "):
-                self.status = self.body[i][8:].strip()
-                self.body.pop(i)
-            elif self.body[i].startswith("@type "):
-                self.te_type = self.body[i][6:].strip()
-                self.body.pop(i)
-            elif self.body[i].startswith("@tags "):
-                self.tags = [x.strip() for x in self.body[i][6:].split(",")]
-                self.body.pop(i)
-            else:
-                i += 1
+        self.title = "no title"
+        self.status = ""
+        self.te_type = ""
+        self.tags = set()
+        self.content = []
+        title_pattern = re.compile("^# (?P<title>.*)$")
+        status_pattern = re.compile("^@status (?P<status>.*)$")
+        type_pattern = re.compile("^@type (?P<type>.*)$")
+        tags_pattern = re.compile("^@tags (?P<tags>.*)$")
+        in_header = True
+        for l in self.body:
+            if in_header:
+                if not l.strip():
+                    continue
 
-            if self.title and self.status and self.te_type and self.tags:
-                break
+                title_match = title_pattern.search(l)
+                if title_match:
+                    self.title = title_match.groupdict()["title"]
+                    continue
+                status_match = status_pattern.search(l)
+                if status_match:
+                    self.status = status_match.groupdict()["status"]
+                    continue
+                type_match = type_pattern.search(l)
+                if type_match:
+                    self.te_type = type_match.groupdict()["type"]
+                    continue
+                tags_match = tags_pattern.search(l)
+                if tags_match:
+                    self.tags = set([x.strip() for x in tags_match.groupdict()["tags"].split(",")])
+                    continue
 
-        if not self.title:
-            self.title = "no title"
+                in_header = False
+            self.content.append(l)
+        self.content = "\n".join(self.content)
 
         self.status_id = -1
         if not self.status:
@@ -116,9 +126,18 @@ class Tessera(object):
                     self.te_type_id = key
                     break
 
+    def _write(self):
+        with open(self.filename, "w") as f:
+            f.write("# %s\n" % self.title)
+            f.write("@status %s\n" % self.status)
+            f.write("@type %s\n" % self.te_type)
+            f.write("@tags %s\n" % ", ".join(self.tags))
+            f.write("\n%s" % self.content)
+
     def summary(self):
         len_title = len(self.title)
         len_status = len(self.status)
+        tags = ", ".join(self.tags)
         title = self.title
         color = None
         if Tessera._status:
@@ -146,7 +165,12 @@ class Tessera(object):
             if colorful.exists(color):
                 title = colorful.get(color)(title)
 
-        return "%s %s %s %s %s %s" % (self.get_ident_short(), title, " " * (40 - len_title), status, " " * (10 - len_status), te_type)
+        return "%s %s %s %s %s %s %s %s" % (self.get_ident_short(), title, " " * (40 - len_title), status, " " * (10 - len_status), te_type, " " * (15 - len(tags)), tags)
+
+    def add_tag(self, tag):
+        self.tags.add(tag)
+        self._write()
+        return True
 
     def ident(self):
         return dict(ident=self.tessera_hash, title=self.title, filename=self.filename, body=self.get_body())

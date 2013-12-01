@@ -62,9 +62,9 @@ class GitCommands(object):
             return False
 
         gt = GitTessera()
-        t = gt.get( args[0] )
+        t = gt.get(args[0])
         if not t:
-          return False
+            return False
 
         short = t.summary()
         length = len(short)
@@ -181,6 +181,27 @@ class GitCommands(object):
         from tesseraweb import TesseraWeb
         web = TesseraWeb()
         web.serve()
+
+    def cmd_tag(self, args):
+        if len(args) != 2:
+            stderr.write("git tessera show takes identifier as argument and new tag\n")
+            return False
+
+        key = args[0]
+        for i in os.listdir(Tessera._tesserae):
+            tessera_path = "%s/%s" % (Tessera._tesserae, i)
+            if not stat.S_ISDIR(os.lstat(tessera_path).st_mode):
+                continue
+            if i.split('-')[0] == key or i == key:
+                break
+        if not tessera_path:
+            stderr.write("git tessera %s not found\n" % key)
+            return False
+
+        t = Tessera(tessera_path)
+        t.add_tag(args[1])
+        self.git_add(t.filename, "tessera updated: add tag %s to %s" % (args[1], t.title))
+        return True
 
     def git_add(self, files, message):
         stderr.write("staging %s" % files)

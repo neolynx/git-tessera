@@ -13,6 +13,8 @@ class Tessera(object):
     def __init__(self, tessera_path):
         self.tessera_path = tessera_path
         self.filename = "%s/tessera" % tessera_path
+        self.mtime = os.lstat(self.filename).st_mtime
+        self.tessera_hash = os.path.basename(self.tessera_path)
         self.title = None
         self.status = None
         self.te_type = None
@@ -157,14 +159,10 @@ class Tessera(object):
         return "%s %s %s %s %s %s"%(self.get_ident_short(), title, " " * (40 - len_title), status, " " * (10 - len_status), te_type)
 
     def ident(self):
-        return dict(ident=self.get_ident(), title=self.title, filename=self.filename, body=self.get_body())
-
-
-    def get_ident(self ):
-        return os.path.basename(self.tessera_path)
+        return dict(ident=self.tessera_hash, title=self.title, filename=self.filename, body=self.get_body())
 
     def get_ident_short(self):
-        return self.get_ident().split('-')[0]
+        return self.tessera_hash.split('-')[0]
 
     def get_body(self):
         return '\n'.join(self.body)

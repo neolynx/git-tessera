@@ -52,7 +52,7 @@ class GitCommands(object):
 
     def cmd_ls(self, args):
         gt = GitTessera()
-        tesserae = gt.ls()
+        tesserae = gt.ls(args)
         for t in tesserae:
             print t.summary()
         return True

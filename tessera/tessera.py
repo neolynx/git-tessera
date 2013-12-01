@@ -7,6 +7,7 @@ from sys import stderr
 
 from colorful import colorful
 
+
 class Tessera(object):
     _tesserae = None
     _status = {}
@@ -22,10 +23,10 @@ class Tessera(object):
         self.te_type = None
 
         if not self._status:
-          self._read_status()
+            self._read_status()
 
         if not self._te_types:
-          self._read_types()
+            self._read_types()
 
         self._read()
         self._parse()
@@ -78,7 +79,7 @@ class Tessera(object):
 
     def _read(self):
         if not os.path.exists(self.filename):
-            stderr.write("tessera file not found: %s\n"%self.fielname)
+            stderr.write("tessera file not found: %s\n" % self.fielname)
             return None
 
         f = open(self.filename, 'r')
@@ -146,7 +147,7 @@ class Tessera(object):
         color = None
         if Tessera._te_types:
             for s in Tessera._te_types:
-              if Tessera._te_types[s][0] == self.te_type:
+                if Tessera._te_types[s][0] == self.te_type:
                     color = Tessera._te_types[s][1]
                     break
             te_type = self.te_type
@@ -156,7 +157,7 @@ class Tessera(object):
             if colorful.exists(color):
                 title = colorful.get(color)(title)
 
-        return "%s %s %s %s %s %s"%(self.get_ident_short(), title, " " * (40 - len_title), status, " " * (10 - len_status), te_type)
+        return "%s %s %s %s %s %s" % (self.get_ident_short(), title, " " * (40 - len_title), status, " " * (10 - len_status), te_type)
 
     def ident(self):
         return dict(ident=self.tessera_hash, title=self.title, filename=self.filename, body=self.get_body())

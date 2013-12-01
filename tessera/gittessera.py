@@ -13,7 +13,7 @@ class GitTessera(object):
     SORTING = {
         "date": lambda t1, t2: t1.mtime < t2.mtime,
         "status": lambda t1, t2: cmp(t1.status_id, t2.status_id),
-        "title": lambda t1, t2: cmp(t1.title.lower(), t2.title.lower()),
+        "title": lambda t1, t2: cmp(t1.get_attribute("title").lower(), t2.get_attribute("title").lower()),
         "hash": lambda t1, t2: cmp(t1.tessera_hash.lower(), t2.tessera_hash.lower())
     }
 
@@ -51,7 +51,8 @@ class GitTessera(object):
         tesserae = []
         for tessera_path in contents:
             t = Tessera(tessera_path)
-            if not tags or any(x in t.tags for x in tags):
+            te_tags = t.get_attribute("tags")
+            if not tags or any(x in te_tags for x in tags):
                 tesserae.append(t)
         tesserae = sorted(tesserae, cmp=sortfunc)
         return tesserae

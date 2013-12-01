@@ -138,7 +138,7 @@ class GitCommands(object):
         p.wait()
 
         t = Tessera(tessera_path)
-        self.git_add(tessera_file, "tessera created: %s" % t.title)
+        self.git_add(tessera_file, "tessera created: %s" % t.get_attribute("title"))
         return True
 
     def cmd_remove(self, args):
@@ -165,14 +165,14 @@ class GitCommands(object):
             return False
 
         t = Tessera(tessera_path)
-        stdout.write("remove tessera %s: %s ? [Y/n] " % (key, t.title))
+        stdout.write("remove tessera %s: %s ? [Y/n] " % (key, t.get_attribute("title")))
         try:
             answer = stdin.readline().strip()
         except KeyboardInterrupt:
             return False
         if not answer or answer.lower() == "y":
             files = ["%s/%s" % (tessera_path, x) for x in os.listdir(tessera_path)]
-            self.git_rm(files, "tessera removed: %s" % t.title)
+            self.git_rm(files, "tessera removed: %s" % t.get_attribute("title"))
 
             from shutil import rmtree
             rmtree(tessera_path)
@@ -200,7 +200,7 @@ class GitCommands(object):
 
         t = Tessera(tessera_path)
         t.add_tag(args[1])
-        self.git_add(t.filename, "tessera updated: add tag %s to %s" % (args[1], t.title))
+        self.git_add(t.filename, "tessera updated: add tag %s to %s" % (args[1], t.get_attribute("title")))
         return True
 
     def git_add(self, files, message):

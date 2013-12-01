@@ -9,11 +9,11 @@ $def with (tesserae)
   <body>
 $for t in tesserae:
   <div class="tessera">
-    <div class="tessera_$t.status">
+    <div class="tessera_$t.get_attribute('status')">
       <div class="id">$t.get_ident_short()</div>
-      <div class="title_$t.te_type"><a href="/tessera?key=$t.get_ident_short()">$t.title</a></div>
-      <div class="status">$t.status</div>
-      <div class="type">$t.te_type</div>
+      <div class="title_$t.get_attribute('type')"><a href="/tessera?key=$t.get_ident_short()">$t.get_attribute('title')</a></div>
+      <div class="status">$t.get_attribute('status')</div>
+      <div class="type">$t.get_attribute('type')</div>
     </div>
   </div>
   </body>

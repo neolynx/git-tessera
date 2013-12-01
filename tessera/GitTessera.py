@@ -17,14 +17,9 @@ class GitTessera:
             return False
 
         contents = [ self.tesserae + "/" + x for x in os.listdir(self.tesserae) if stat.S_ISDIR(os.lstat(self.tesserae + "/" + x).st_mode)]
-        sorted(contents, cmp = _cmp_tessera)
         tesserae = []
         for tessera_path in contents:
             tesserae.append(Tessera(tessera_path))
+        tesserae.sort( key = lambda x: x.status_id )
         return tesserae
-
-def _cmp_tessera(a, b):
-  aa = os.lstat("%s/tessera"%a)
-  bb = os.lstat("%s/tessera"%b)
-  return aa.st_mtime < bb.st_mtime
 

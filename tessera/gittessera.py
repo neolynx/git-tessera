@@ -32,16 +32,27 @@ class GitTessera(object):
         except ValueError:
             sortfunc = GitTessera.SORTING["status"]
         except IndexError:
-            colorful.out.bold_red("Please specify aa sort algorithm. Available: %s" % (", ".join(GitTessera.SORTING.keys())))
+            colorful.out.bold_red("Please specify a sort algorithm. Available: %s" % (", ".join(GitTessera.SORTING.keys())))
             return []
         except KeyError:
             colorful.out.bold_red("No sort algorithm for '%s' available" % args[idx + 1])
             return []
 
+        try:
+            idx = args.index("--tags")
+            tags = args[idx + 1].split(",")
+        except ValueError:
+            tags = None
+        except IndexError:
+            colorful.out.bold_red("Please specify minimum one tag.")
+            return []
+
         contents = [self.tesserae + "/" + x for x in os.listdir(self.tesserae) if stat.S_ISDIR(os.lstat(self.tesserae + "/" + x).st_mode)]
         tesserae = []
         for tessera_path in contents:
-            tesserae.append(Tessera(tessera_path))
+            t = Tessera(tessera_path)
+            if not tags or any(x in t.tags for x in tags):
+                tesserae.append(t)
         tesserae = sorted(tesserae, cmp=sortfunc)
         return tesserae
 

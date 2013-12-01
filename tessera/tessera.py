@@ -165,7 +165,7 @@ class Tessera(object):
             if colorful.exists(color):
                 title = colorful.get(color)(title)
 
-        return "%s %s %s %s %s %s %s %s" % (self.get_ident_short(), title, " " * (40 - len_title), status, " " * (10 - len_status), te_type, " " * (15 - len(tags)), tags)
+        return "%s %s %s %s %s %s %s %s" % (self.get_ident_short(), title, " " * (40 - len_title), status, " " * (10 - len_status), te_type, " " * (10 - len(te_type)), tags)
 
     def add_tag(self, tag):
         self.tags.add(tag)

@@ -23,3 +23,16 @@ class GitTessera:
         tesserae.sort( key = lambda x: x.status_id )
         return tesserae
 
+    def get(self, key):
+        tessera_file = None
+        for i in os.listdir(self.tesserae):
+            tessera_path = "%s/%s"%(self.tesserae, i)
+            if not stat.S_ISDIR(os.lstat(tessera_path).st_mode):
+                continue
+            if i.split('-')[0] == key or i == key:
+                break
+        if not tessera_path:
+            stderr.write("git tessera %s not found\n"%key)
+            return None
+        return Tessera(tessera_path)
+

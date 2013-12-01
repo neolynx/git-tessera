@@ -1,4 +1,10 @@
 
+a
+{
+  text-decoration: inherit;
+  color: inherit;
+}
+
 div.tessera
 {
   clear: both;

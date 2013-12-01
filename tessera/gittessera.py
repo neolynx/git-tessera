@@ -29,7 +29,7 @@ class GitTessera(object):
             idx = args.index("--sort")
             sortfunc = GitTessera.SORTING[args[idx + 1]]
         except ValueError:
-            sortfunc = GitTessera.SORTING["date"]
+            sortfunc = GitTessera.SORTING["status"]
         except IndexError:
             colorful.out.bold_red("Please specify aa sort algorithm. Available: %s" % (", ".join(GitTessera.SORTING.keys())))
             return []

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import web
 import markdown
 import sys

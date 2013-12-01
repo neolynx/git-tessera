@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import stat
 from uuid import uuid1

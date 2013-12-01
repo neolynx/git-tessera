@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from sys import argv, stdin, stdout, stderr, exit
 import os

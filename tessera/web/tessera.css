@@ -1,0 +1,83 @@
+
+div.tessera
+{
+  clear: both;
+}
+
+div.tessera_done
+{
+  clear: both;
+  background-color: #afa;
+  float: left;
+}
+
+div.tessera_obsolete
+{
+  clear: both;
+  background-color: gray;
+  float: left;
+}
+
+div.tessera_open
+{
+  clear: both;
+  background-color: yellow;
+  float: left;
+}
+
+div.id
+{
+  float: left;
+  display: inline-block;
+  padding: 2px;
+  width: 6em;
+}
+
+div.title_todo
+{
+  padding: 2px;
+  float: left;
+  font-weight: bold;
+  width: 20em;
+}
+
+div.title_bug
+{
+  padding: 2px;
+  float: left;
+  width: 20em;
+  font-weight: bold;
+  color: red;
+}
+
+div.title_wishlist
+{
+  padding: 2px;
+  float: left;
+  width: 20em;
+  font-weight: bold;
+  color: blue;
+}
+
+div.title_feature
+{
+  padding: 2px;
+  float: left;
+  width: 20em;
+  font-weight: bold;
+  color: green;
+}
+
+div.status
+{
+  padding: 2px;
+  float: left;
+  width: 10em;
+}
+
+div.type
+{
+  padding: 2px;
+  float: left;
+  width: 10em;
+}

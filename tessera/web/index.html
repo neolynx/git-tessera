@@ -4,9 +4,17 @@ $def with (tesserae)
   <head>
     <title>GitTessera Web</title>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="tessera.css">
   </head>
   <body>
 $for t in tesserae:
-  <div>$t.title</div>
+  <div class="tessera">
+    <div class="tessera_$t.status">
+      <div class="id">$t.get_ident_short()</div>
+      <div class="title_$t.te_type">$t.title</div>
+      <div class="status">$t.status</div>
+      <div class="type">$t.te_type</div>
+    </div>
+  </div>
   </body>
 </html>

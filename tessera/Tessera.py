@@ -26,45 +26,50 @@ class Tessera(object):
         self._parse()
 
     def _read_status(self):
-          status_file = "%s/status" % Tessera._tesserae
-          if not os.path.exists(status_file):
-              print "file not found:", status_file
-              Tessera._status = False
-              return
+        status_file = "%s/status" % Tessera._tesserae
+        if not os.path.exists(status_file):
+            print "file not found:", status_file
+            Tessera._status = False
+            return
 
-          f = open(status_file, 'r')
-          i = 0
-          for line in f.readlines():
-              line = line.strip()
-              if line:
-                  a = re.split(r'[ \t]+', line)
-                  if len(a) != 2:
-                      print "invalid status line: %s"%line
-                      break
-                  Tessera._status[i]= ( a[0], a[1] )
-                  i += 1
-          f.close()
+        f = open(status_file, 'r')
+        i = 0
+        for line in f.readlines():
+            line = line.strip()
+            if line:
+                a = re.split(r'[ \t]+', line)
+                if len(a) != 2:
+                    colorful.out.bold_red("Error in %s: invalid status line: %s" % (status_file, line))
+                    break
+                if not colorful.exists(a[1]):
+                    colorful.out.bold_red("Error in %s: color %s does not exist" % (status_file, a[1]))
+                    break
+                Tessera._status[i] = (a[0], a[1])
+                i += 1
+        f.close()
 
     def _read_types(self):
-          types_file = "%s/types" % Tessera._tesserae
-          if not os.path.exists(types_file):
-              print "file not found:", types_file
-              Tessera._te_types = False
-              return
+        types_file = "%s/types" % Tessera._tesserae
+        if not os.path.exists(types_file):
+            print "file not found:", types_file
+            Tessera._te_types = False
+            return
 
-          f = open(types_file, 'r')
-          i = 0
-          for line in f.readlines():
-              line = line.strip()
-              if line:
-                  a = re.split(r'[ \t]+', line)
-                  if len(a) != 2:
-                      print "invalid te_types line: %s"%line
-                      break
-                  Tessera._te_types[i] = ( a[0], a[1] )
-                  i += 1
-          f.close()
-
+        f = open(types_file, 'r')
+        i = 0
+        for line in f.readlines():
+            line = line.strip()
+            if line:
+                a = re.split(r'[ \t]+', line)
+                if len(a) != 2:
+                    colorful.out.bold_red("Error in %s: invalid status line: %s" % (types_file, line))
+                    break
+                if not colorful.exists(a[1]):
+                    colorful.out.bold_red("Error in %s: color %s does not exist" % (types_file, a[1]))
+                    break
+                Tessera._te_types[i] = (a[0], a[1])
+                i += 1
+        f.close()
 
     def _read(self):
         if not os.path.exists(self.filename):

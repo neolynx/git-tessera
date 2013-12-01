@@ -4,8 +4,8 @@ from uuid import uuid1
 from subprocess import check_output, Popen
 from sys import stdin, stdout, stderr
 
-from Tessera import Tessera
-from GitTessera import GitTessera
+from tessera import Tessera
+from gittessera import GitTessera
 from gittle import Gittle
 import shutil
 
@@ -187,7 +187,7 @@ class GitCommands(object):
             rmtree(tessera_path)
 
     def cmd_serve(self, args):
-      from TesseraWeb import TesseraWeb
+      from tesseraweb import TesseraWeb
       web = TesseraWeb()
       web.serve()
 

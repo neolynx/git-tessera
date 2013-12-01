@@ -5,7 +5,7 @@ import os
 import shutil
 import stat
 from gittle import Gittle
-from GitCommands import GitCommands
+from gitcommands import GitCommands
 
 from colorful import colorful
 

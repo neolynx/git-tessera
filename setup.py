@@ -18,7 +18,7 @@ setup(
     platforms=["Linux", "Windows", "MAC OS X"],
     url="https://github.com/neolynx/git-tessera.git",
     download_url="https://github.com/neolynx/git-tessera.git",
-    install_requires=["gittle==0.2.2", "web.py"],
+    install_requires=["gittle==0.2.2", "web.py", "colorful==0.01.02"],
     packages=["tessera"],
     entry_points={"console_scripts": ["git-tessera = tessera.main:main"]},
     package_dir={'git-tessera': 'tessera'},

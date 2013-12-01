@@ -39,6 +39,7 @@ div.title_todo
   float: left;
   font-weight: bold;
   width: 20em;
+  white-space: nowrap;
 }
 
 div.title_bug
@@ -48,6 +49,7 @@ div.title_bug
   width: 20em;
   font-weight: bold;
   color: red;
+  white-space: nowrap;
 }
 
 div.title_wishlist
@@ -57,6 +59,7 @@ div.title_wishlist
   width: 20em;
   font-weight: bold;
   color: blue;
+  white-space: nowrap;
 }
 
 div.title_feature
@@ -65,7 +68,8 @@ div.title_feature
   float: left;
   width: 20em;
   font-weight: bold;
-  color: green;
+  color: blue;
+  white-space: nowrap;
 }
 
 div.status
@@ -73,6 +77,7 @@ div.status
   padding: 2px;
   float: left;
   width: 10em;
+  text-align: center;
 }
 
 div.type
@@ -80,4 +85,5 @@ div.type
   padding: 2px;
   float: left;
   width: 10em;
+  text-align: center;
 }

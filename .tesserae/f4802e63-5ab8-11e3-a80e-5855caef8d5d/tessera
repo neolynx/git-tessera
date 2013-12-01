@@ -1,0 +1,7 @@
+# show author and creation date in server
+@status new
+@type feature
+
+When showing a tessera in the web browser,
+the author and creation date of the tessera
+shall be displayed as well.

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import web
-import markdown
 import sys
 from os import path
 from gittessera import GitTessera

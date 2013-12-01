@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from sys import argv, stdin, stdout, stderr, exit
-import os
-import shutil
-import stat
-from gittle import Gittle
+from sys import argv, stderr, exit
 from gitcommands import GitCommands
 
-from colorful import colorful
 
 def main():
   cmd = "ls"

@@ -3,7 +3,6 @@
 import os
 import re
 
-from gittle import Gittle
 from colorful import colorful
 
 class Tessera(object):

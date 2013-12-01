@@ -3,7 +3,7 @@
 import os
 import stat
 from uuid import uuid1
-from subprocess import check_output, Popen
+from subprocess import Popen
 from sys import stdin, stdout, stderr
 
 from tessera import Tessera

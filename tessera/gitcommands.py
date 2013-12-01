@@ -71,7 +71,7 @@ class GitCommands(object):
         print "=" * length
         print short
         print "=" * length
-        print t.get_body()
+        print t.content
         return True
 
     def cmd_edit(self, args):

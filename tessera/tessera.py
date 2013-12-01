@@ -172,5 +172,3 @@ class Tessera(object):
     def get_ident_short(self):
         return self.tessera_hash.split('-')[0]
 
-    def get_body(self):
-        return '\n'.join(self.body)

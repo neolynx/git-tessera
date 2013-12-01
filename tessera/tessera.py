@@ -74,6 +74,7 @@ class Tessera(object):
     def _parse(self):
         self.title = None
         self.status = None
+        self.tags = []
         i = 0
         while i < len(self.body):
             if self.body[i].startswith("# "):
@@ -85,10 +86,13 @@ class Tessera(object):
             elif self.body[i].startswith("@type "):
                 self.te_type = self.body[i][6:].strip()
                 self.body.pop(i)
+            elif self.body[i].startswith("@tags "):
+                self.tags = [x.strip() for x in self.body[i][6:].split(",")]
+                self.body.pop(i)
             else:
                 i += 1
 
-            if self.title and self.status and self.te_type:
+            if self.title and self.status and self.te_type and self.tags:
                 break
 
         if not self.title:

@@ -2,12 +2,12 @@ $def with (tessera)
 <!DOCTYPE html>
 <html>
   <head>
-    <title>GitTessera Web - $tessera.title</title>
+    <title>GitTessera Web - $tessera.get_attribute('title')</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="style/tessera.css">
   </head>
   <body>
-  <h1>$tessera.title</h1>
+  <h1>$tessera.get_attribute('title')</h1>
   $:tessera.markdown
   </body>
 </html>

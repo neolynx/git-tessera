@@ -3,6 +3,8 @@
 import os
 import re
 
+from sys import stderr
+
 from colorful import colorful
 
 class Tessera(object):

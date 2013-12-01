@@ -101,7 +101,7 @@ class GitCommands(object):
                     found = True
                     break
             if not found:
-                stder.write("git tessera %s not found\n"%key)
+                stderr.write("git tessera %s not found\n"%key)
                 return False
 
             tessera_paths.append(tessera_path)

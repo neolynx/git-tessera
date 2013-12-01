@@ -5,3 +5,4 @@ git_tessera.egg-info/
 build/
 dist/
 .DS_Store
+tessera-env

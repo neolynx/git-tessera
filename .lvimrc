@@ -1,0 +1,8 @@
+" indentation
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+
+" syntastic config
+" E501: warning for too long lines
+let g:syntastic_python_flake8_args = '--ignore=E501'

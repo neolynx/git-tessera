@@ -19,7 +19,6 @@ class TesseraWeb(object):
 
 class index(object):
     def GET(self):
-        html = ""
         gt = GitTessera()
         tesserae = gt.ls()
         return render.index(tesserae)

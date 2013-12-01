@@ -64,7 +64,6 @@ class GitCommands(object):
             return False
 
         key = args[0]
-        tessera_file = None
         for i in os.listdir(Tessera._tesserae):
             tessera_path = "%s/%s"%(Tessera._tesserae, i)
             if not stat.S_ISDIR(os.lstat(tessera_path).st_mode):

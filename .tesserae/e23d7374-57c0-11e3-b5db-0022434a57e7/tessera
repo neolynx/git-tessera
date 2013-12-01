@@ -1,5 +1,5 @@
 # ignore dirty submodules
-@status new
+@status obsolete
 @type todo
 
 if a git repo has submodules, do not fail if they are dirty

@@ -33,49 +33,34 @@ class Tessera(object):
 
     def _read_status(self):
         status_file = "%s/status" % Tessera._tesserae
-        if not os.path.exists(status_file):
-            print "file not found:", status_file
-            Tessera._status = False
-            return
-
-        f = open(status_file, 'r')
-        i = 0
-        for line in f.readlines():
-            line = line.strip()
-            if line:
-                a = re.split(r'[ \t]+', line)
-                if len(a) != 2:
-                    colorful.out.bold_red("Error in %s: invalid status line: %s" % (status_file, line))
-                    break
-                if not colorful.exists(a[1]):
-                    colorful.out.bold_red("Error in %s: color %s does not exist" % (status_file, a[1]))
-                    break
-                Tessera._status[i] = (a[0], a[1])
-                i += 1
-        f.close()
+        Tessera._status = self._read_config(status_file)
 
     def _read_types(self):
         types_file = "%s/types" % Tessera._tesserae
-        if not os.path.exists(types_file):
-            print "file not found:", types_file
+        Tessera._te_types = self._read_config(types_file)
+
+    def _read_config(self, filename):
+        if not os.path.exists(filename):
+            colorful.out.bold_red("file not found: %s" % filename)
             Tessera._te_types = False
             return
 
-        f = open(types_file, 'r')
-        i = 0
-        for line in f.readlines():
-            line = line.strip()
-            if line:
-                a = re.split(r'[ \t]+', line)
-                if len(a) != 2:
-                    colorful.out.bold_red("Error in %s: invalid status line: %s" % (types_file, line))
-                    break
-                if not colorful.exists(a[1]):
-                    colorful.out.bold_red("Error in %s: color %s does not exist" % (types_file, a[1]))
-                    break
-                Tessera._te_types[i] = (a[0], a[1])
-                i += 1
-        f.close()
+        config = {}
+        with open(filename, 'r') as f:
+            i = 0
+            for line in f.readlines():
+                line = line.strip()
+                if line:
+                    a = re.split(r'[ \t]+', line)
+                    if len(a) != 2:
+                        colorful.out.bold_red("Error in %s: invalid status line: %s" % (filename, line))
+                        break
+                    if not colorful.exists(a[1]):
+                        colorful.out.bold_red("Error in %s: color %s does not exist" % (filename, a[1]))
+                        break
+                    config[i] = (a[0], a[1])
+                    i += 1
+        return config
 
     def _read(self):
         if not os.path.exists(self.filename):

@@ -11,13 +11,13 @@ from gittessera import GitTessera
 from gittle import Gittle
 import shutil
 
+
 class GitCommands(object):
 
     def __init__(self):
         self.gitdir = "."
         self.git = Gittle(self.gitdir)
         Tessera._tesserae = os.path.relpath("%s/.tesserae" % self.gitdir)
-
 
     def cmd_init(self, args):
         if len(args) != 0:
@@ -29,13 +29,13 @@ class GitCommands(object):
             #return False
 
         if os.path.exists(Tessera._tesserae):
-            stderr.write("git tesserae directory already exists: %s\n"%Tessera._tesserae)
+            stderr.write("git tesserae directory already exists: %s\n" % Tessera._tesserae)
             return False
         os.mkdir(Tessera._tesserae)
 
         files = []
-        t = "%s/template"%Tessera._tesserae
-        shutil.copyfile("%s/config/template"%os.path.dirname(os.path.realpath(__file__)), t)
+        t = "%s/template" % Tessera._tesserae
+        shutil.copyfile("%s/config/template" % os.path.dirname(os.path.realpath(__file__)), t)
         files.append(t)
 
         t = "%s/status"%Tessera._tesserae
@@ -189,9 +189,9 @@ class GitCommands(object):
             rmtree(tessera_path)
 
     def cmd_serve(self, args):
-      from tesseraweb import TesseraWeb
-      web = TesseraWeb()
-      web.serve()
+        from tesseraweb import TesseraWeb
+        web = TesseraWeb()
+        web.serve()
 
     def git_add(self, files, message):
         stderr.write("staging %s" % files)
@@ -200,4 +200,3 @@ class GitCommands(object):
     def git_rm(self, files, message):
         self.git.rm(files)
         self.git.commit(message=message)
-

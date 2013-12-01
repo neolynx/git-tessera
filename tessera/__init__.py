@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
-from GitTessera import *
-from Tessera import *
+from gittessera import *
+from tessera import *

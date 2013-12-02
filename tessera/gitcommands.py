@@ -5,11 +5,13 @@ import stat
 from uuid import uuid1
 from subprocess import Popen
 from sys import stdin, stdout, stderr
+import types
+import shutil
+import distutils
 
 from tessera import Tessera
 from gittessera import GitTessera
 from gittle import Gittle
-import shutil
 
 
 class GitCommands(object):
@@ -97,9 +99,7 @@ class GitCommands(object):
             tessera_paths.append(tessera_path)
 
         tessera_files = ["%s/tessera" % x for x in tessera_paths]
-        p = Popen(["sensible-editor"] + tessera_files)
-        p.communicate()
-        p.wait()
+        _edit(tessera_files)
 
         #if self.git.is_dirty():
         for tessera_path in tessera_paths:
@@ -133,9 +133,7 @@ class GitCommands(object):
         fin.close()
         fout.close()
 
-        p = Popen(["sensible-editor", tessera_file])
-        p.communicate()
-        p.wait()
+        _edit(tessera_file)
 
         t = Tessera(tessera_path)
         self.git_add(tessera_file, "tessera created: %s" % t.get_attribute("title"))
@@ -210,3 +208,29 @@ class GitCommands(object):
     def git_rm(self, files, message):
         self.git.rm(files)
         self.git.commit(message=message)
+
+def _edit(files):
+    """ Edit the given list of files with the user's default
+        editor.
+
+        The editor used for editing the files is choosen by this pattern:
+        1. If sensible-editor is available, this editor is started.
+        2. If the environment variable EDITOR is set, this editor is used
+        3. The vi is started else for editing the files.
+
+        @returns: The status code of the editor
+    """
+    if isinstance(files, types.StringTypes):
+        files = [ files ]
+
+    # choose the right editor
+    try:
+        p = Popen(['sensible-editor'] + files)
+    except:
+        editor = os.getenv('EDITOR')
+        if editor == None:
+            editor = 'vi'
+        p = Popen([editor] + files)
+    p.communicate()
+    return p.wait()
+

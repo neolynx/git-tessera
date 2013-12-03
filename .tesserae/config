@@ -1,0 +1,18 @@
+[core]
+editor = vim
+
+[user]
+name = Max Muster
+email = tuxmax@pinguins.pg
+
+[color "status"]
+new = green
+open = brown
+done = bold_green
+obsolete = white
+
+[color "type"]
+bug = red
+todo = white
+wishlist = blue
+feature = green

@@ -5,11 +5,15 @@ import stat
 from uuid import uuid1
 from subprocess import Popen
 from sys import stdin, stdout, stderr
+import types
+import shutil
 
 from tessera import Tessera
 from gittessera import GitTessera
 from gittle import Gittle
-import shutil
+from tesseraconfig import TesseraConfig
+from exceptions import TesseraError
+from colorful import colorful
 
 
 class GitCommands(object):
@@ -18,6 +22,7 @@ class GitCommands(object):
         self.gitdir = "."
         self.git = Gittle(self.gitdir)
         Tessera._tesserae = os.path.relpath("%s/.tesserae" % self.gitdir)
+        self._config = TesseraConfig(os.path.join(Tessera._tesserae, "config"))
 
     def cmd_init(self, args):
         if len(args) != 0:
@@ -50,7 +55,7 @@ class GitCommands(object):
         return True
 
     def cmd_ls(self, args):
-        gt = GitTessera()
+        gt = GitTessera(self._config)
         tesserae = gt.ls(args)
         for t in tesserae:
             print t.summary()
@@ -61,17 +66,17 @@ class GitCommands(object):
             stderr.write("git tessera show takes identifier as argument\n")
             return False
 
-        gt = GitTessera()
-        t = gt.get( args[0] )
+        gt = GitTessera(self._config)
+        t = gt.get(args[0])
         if not t:
-          return False
+            return False
 
         short = t.summary()
         length = len(short)
         print "=" * length
         print short
         print "=" * length
-        print t.get_body()
+        print t.content
         return True
 
     def cmd_edit(self, args):
@@ -97,13 +102,11 @@ class GitCommands(object):
             tessera_paths.append(tessera_path)
 
         tessera_files = ["%s/tessera" % x for x in tessera_paths]
-        p = Popen(["sensible-editor"] + tessera_files)
-        p.communicate()
-        p.wait()
+        _edit(tessera_files, self._config)
 
         #if self.git.is_dirty():
         for tessera_path in tessera_paths:
-            t = Tessera(tessera_path)
+            t = Tessera(tessera_path, self._config)
             self.git_add("%s/tessera" % tessera_path, "tessera updated: %s" % t.title)
         return True
 
@@ -133,12 +136,10 @@ class GitCommands(object):
         fin.close()
         fout.close()
 
-        p = Popen(["sensible-editor", tessera_file])
-        p.communicate()
-        p.wait()
+        _edit(tessera_file, self._config)
 
-        t = Tessera(tessera_path)
-        self.git_add(tessera_file, "tessera created: %s" % t.title)
+        t = Tessera(tessera_path, self._config)
+        self.git_add(tessera_file, "tessera created: %s" % t.get_attribute("title"))
         return True
 
     def cmd_remove(self, args):
@@ -164,15 +165,15 @@ class GitCommands(object):
             stderr.write("git tessera %s not found\n" % key)
             return False
 
-        t = Tessera(tessera_path)
-        stdout.write("remove tessera %s: %s ? [Y/n] " % (key, t.title))
+        t = Tessera(tessera_path, self._config)
+        stdout.write("remove tessera %s: %s ? [Y/n] " % (key, t.get_attribute("title")))
         try:
             answer = stdin.readline().strip()
         except KeyboardInterrupt:
             return False
         if not answer or answer.lower() == "y":
             files = ["%s/%s" % (tessera_path, x) for x in os.listdir(tessera_path)]
-            self.git_rm(files, "tessera removed: %s" % t.title)
+            self.git_rm(files, "tessera removed: %s" % t.get_attribute("title"))
 
             from shutil import rmtree
             rmtree(tessera_path)
@@ -182,6 +183,27 @@ class GitCommands(object):
         web = TesseraWeb()
         web.serve()
 
+    def cmd_tag(self, args):
+        if len(args) != 2:
+            stderr.write("git tessera show takes identifier as argument and new tag\n")
+            return False
+
+        key = args[0]
+        for i in os.listdir(Tessera._tesserae):
+            tessera_path = "%s/%s" % (Tessera._tesserae, i)
+            if not stat.S_ISDIR(os.lstat(tessera_path).st_mode):
+                continue
+            if i.split('-')[0] == key or i == key:
+                break
+        if not tessera_path:
+            stderr.write("git tessera %s not found\n" % key)
+            return False
+
+        t = Tessera(tessera_path, self._config)
+        t.add_tag(args[1])
+        self.git_add(t.filename, "tessera updated: add tag %s to %s" % (args[1], t.get_attribute("title")))
+        return True
+
     def git_add(self, files, message):
         stderr.write("staging %s" % files)
         self.git.commit(message=message, files=files)
@@ -189,3 +211,34 @@ class GitCommands(object):
     def git_rm(self, files, message):
         self.git.rm(files)
         self.git.commit(message=message)
+
+
+def _edit(files, config):
+    """ Edit the given list of files with the user's default
+        editor.
+
+        The editor used for editing the files is choosen by this pattern:
+        1. If core.editor is defined in config file
+        2. If sensible-editor is available, this editor is started.
+        3. If the environment variable EDITOR is set, this editor is used
+        4. log error
+
+        @returns: The status code of the editor
+    """
+    if isinstance(files, types.StringTypes):
+        files = [files]
+
+    # choose the right editor
+    try:
+        p = Popen([config.get("core", "editor")] + files)
+    except TesseraError:
+        try:
+            p = Popen(["sensible-editor"] + files)
+        except:
+            editor = os.getenv('EDITOR')
+            if editor is None:
+                colorful.out.bold_red("No editor found to edit. Please configure core.editor in %s" % config.get_path())
+                return False
+            p = Popen([editor] + files)
+    p.communicate()
+    return p.wait()

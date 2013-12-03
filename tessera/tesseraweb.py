@@ -36,13 +36,14 @@ class css:
         f.close()
         return stylesheet
 
+
 class tessera:
-  def GET(self, key):
-    i = web.input(key=None)
-    gt = GitTessera()
-    tessera = gt.get( i.key )
-    if not tessera:
-      return "not found"
-    render = web.template.render('%s/web'%path.dirname(path.realpath(__file__)))
-    tessera.markdown = markdown.markdown(tessera.get_body())
-    return render.detail(tessera)
+    def GET(self, key):
+        i = web.input(key=None)
+        gt = GitTessera()
+        tessera = gt.get(i.key)
+        if not tessera:
+            return "not found"
+        render = web.template.render('%s/web' % path.dirname(path.realpath(__file__)))
+        tessera.markdown = markdown.markdown(tessera.content)
+        return render.detail(tessera)

@@ -14,9 +14,19 @@ class TesseraConfig(object):
         self._path = path
         self._parse()
 
+    def get_path(self):
+        return self._path
+
     def _parse(self):
         self._config = ConfigParser()
         self._config.read(self._path)
+
+    def has_option(self, section, option):
+        try:
+            self._config.get(section, option)
+            return True
+        except:
+            return False
 
     def get(self, section, option):
         try:

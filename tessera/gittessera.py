@@ -17,10 +17,11 @@ class GitTessera(object):
         "hash": lambda t1, t2: cmp(t1.tessera_hash.lower(), t2.tessera_hash.lower())
     }
 
-    def __init__(self):
+    def __init__(self, config):
         self.gitdir = "."
         self.git = Gittle(self.gitdir)
         self.tesserae = "%s/.tesserae" % self.gitdir
+        self._config = config
 
     def ls(self, args=[]):
         if not os.path.exists(self.tesserae):
@@ -50,7 +51,7 @@ class GitTessera(object):
         contents = [self.tesserae + "/" + x for x in os.listdir(self.tesserae) if stat.S_ISDIR(os.lstat(self.tesserae + "/" + x).st_mode)]
         tesserae = []
         for tessera_path in contents:
-            t = Tessera(tessera_path)
+            t = Tessera(tessera_path, self._config)
             te_tags = t.get_attribute("tags")
             if not tags or any(x in te_tags for x in tags):
                 tesserae.append(t)
@@ -67,4 +68,4 @@ class GitTessera(object):
         if not tessera_path:
             stderr.write("git tessera %s not found\n" % key)
             return None
-        return Tessera(tessera_path)
+        return Tessera(tessera_path, self._config)

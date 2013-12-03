@@ -7,11 +7,11 @@ from subprocess import Popen
 from sys import stdin, stdout, stderr
 import types
 import shutil
-import distutils
 
 from tessera import Tessera
 from gittessera import GitTessera
 from gittle import Gittle
+from tesseraconfig import TesseraConfig
 
 
 class GitCommands(object):
@@ -20,6 +20,7 @@ class GitCommands(object):
         self.gitdir = "."
         self.git = Gittle(self.gitdir)
         Tessera._tesserae = os.path.relpath("%s/.tesserae" % self.gitdir)
+        self._config = TesseraConfig(os.path.join(Tessera._tesserae, "config"))
 
     def cmd_init(self, args):
         if len(args) != 0:
@@ -52,7 +53,7 @@ class GitCommands(object):
         return True
 
     def cmd_ls(self, args):
-        gt = GitTessera()
+        gt = GitTessera(self._config)
         tesserae = gt.ls(args)
         for t in tesserae:
             print t.summary()
@@ -63,7 +64,7 @@ class GitCommands(object):
             stderr.write("git tessera show takes identifier as argument\n")
             return False
 
-        gt = GitTessera()
+        gt = GitTessera(self._config)
         t = gt.get(args[0])
         if not t:
             return False

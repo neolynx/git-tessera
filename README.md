@@ -4,17 +4,17 @@ The most simple git based ticketing system.
 
 We believe that:
 
-    * Issues belong to the code. Point.
-    * A powerful system can be build with minimum effort
-    * Simplicity is the solution to our complex environment.
+* Issues belong to the code. Point.
+* A powerful system can be build with minimum effort
+* Simplicity is the solution to our complex environment.
 
 If you want to
 
-    * get rid of loosing your tickets because of changing the issue management system
-    * let your issues flow with your branches and patches
-    * have documented your issues with your code
-    * have a real unique and persistent issue id
-    * a shaXX save documented issue system
+* get rid of loosing your tickets because of changing the issue management system
+* let your issues flow with your branches and patches
+* have documented your issues with your code
+* have a real unique and persistent issue id
+* a shaXX save documented issue system
 
 ... take a look at tessera.
 
@@ -23,21 +23,21 @@ If you want to
 
 ## Installation
 
-    ```bash
-    git clone https://github.com/neolynx/git-tessera.git tessera
-    cd tessera
-    python setup.py install
-    ```
+```bash
+git clone https://github.com/neolynx/git-tessera.git tessera
+cd tessera
+python setup.py install
+```
 
 ## Usage
 
-    ```bash
-    cd my_favorite_git_project
-    git tessera init
-    git tessera create my first ticket
-    git tessera ls
-    git tessera edit <tessera-id>
-    ```
+```bash
+cd my_favorite_git_project
+git tessera init
+git tessera create my first ticket
+git tessera ls
+git tessera edit <tessera-id>
+```
 ## Development
 
 We recommend you to develop git-tessera inside a virtualenv, since the dependencies can be managed much easier and no unwanted packages installed somewhere on the system are involved.

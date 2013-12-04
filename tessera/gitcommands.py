@@ -12,8 +12,7 @@ from tessera import Tessera
 from gittessera import GitTessera
 from gittle import Gittle
 from tesseraconfig import TesseraConfig
-from exceptions import TesseraError
-from colorful import colorful
+from exceptions import TesseraError, ArgumentError
 
 
 class GitCommands(object):
@@ -26,16 +25,11 @@ class GitCommands(object):
 
     def cmd_init(self, args):
         if len(args) != 0:
-            stderr.write("git tessera init takes no arguments\n")
-            return False
-
-        #if self.git.is_dirty():
-            #stderr.write("repo is dirty\n")
-            #return False
+            raise ArgumentError("git tessera init takes no arguments")
 
         if os.path.exists(Tessera._tesserae):
-            stderr.write("git tesserae directory already exists: %s\n" % Tessera._tesserae)
-            return False
+            raise TesseraError("git tesserae directory already exists: %s" % Tessera._tesserae)
+
         os.mkdir(Tessera._tesserae)
 
         files = []
@@ -63,8 +57,7 @@ class GitCommands(object):
 
     def cmd_show(self, args):
         if len(args) != 1:
-            stderr.write("git tessera show takes identifier as argument\n")
-            return False
+            raise ArgumentError("git tessera show takes identifier as argument")
 
         gt = GitTessera(self._config)
         t = gt.get(args[0])
@@ -81,8 +74,7 @@ class GitCommands(object):
 
     def cmd_edit(self, args):
         if len(args) < 1:
-            stderr.write("git tessera edit takes one or more identifier as argument\n")
-            return False
+            raise ArgumentError("git tessera edit takes one or more identifier as argument")
 
         tessera_paths = []
         for key in args:
@@ -96,8 +88,7 @@ class GitCommands(object):
                     found = True
                     break
             if not found:
-                stderr.write("git tessera %s not found\n" % key)
-                return False
+                raise TesseraError("git tessera %s not found" % key)
 
             tessera_paths.append(tessera_path)
 
@@ -112,8 +103,7 @@ class GitCommands(object):
 
     def cmd_create(self, args):
         if len(args) < 1:
-            stderr.write("git tessera create needs arguments\n")
-            return False
+            raise ArgumentError("git tessera create needs arguments")
 
         #if self.git.is_dirty():
         #    stderr.write("repo is dirty\n")
@@ -144,12 +134,7 @@ class GitCommands(object):
 
     def cmd_remove(self, args):
         if len(args) != 1:
-            stderr.write("git tessera remove takes identifier as argument\n")
-            return False
-
-        #if self.git.is_dirty():
-            #stderr.write("repo is dirty\n")
-            #return False
+            raise ArgumentError("git tessera remove takes identifier as argument")
 
         key = args[0]
         tessera_file = None
@@ -162,8 +147,7 @@ class GitCommands(object):
                 tessera_file = "%s/tessera" % tessera_path
                 break
         if not tessera_file:
-            stderr.write("git tessera %s not found\n" % key)
-            return False
+            raise TesseraError("git tessera %s not found" % key)
 
         t = Tessera(tessera_path, self._config)
         stdout.write("remove tessera %s: %s ? [Y/n] " % (key, t.get_attribute("title")))
@@ -185,8 +169,7 @@ class GitCommands(object):
 
     def cmd_tag(self, args):
         if len(args) != 2:
-            stderr.write("git tessera show takes identifier as argument and new tag\n")
-            return False
+            raise ArgumentError("git tessera show takes identifier as argument and new tag")
 
         key = args[0]
         for i in os.listdir(Tessera._tesserae):
@@ -196,8 +179,7 @@ class GitCommands(object):
             if i.split('-')[0] == key or i == key:
                 break
         if not tessera_path:
-            stderr.write("git tessera %s not found\n" % key)
-            return False
+            raise ArgumentError("git tessera %s not found" % key)
 
         t = Tessera(tessera_path, self._config)
         t.add_tag(args[1])
@@ -237,8 +219,7 @@ def _edit(files, config):
         except:
             editor = os.getenv('EDITOR')
             if editor is None:
-                colorful.out.bold_red("No editor found to edit. Please configure core.editor in %s" % config.get_path())
-                return False
+                raise TesseraError("No editor found to edit. Please configure core.editor in %s" % config.get_path())
             p = Popen([editor] + files)
     p.communicate()
     return p.wait()

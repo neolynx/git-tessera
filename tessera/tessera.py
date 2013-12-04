@@ -29,8 +29,7 @@ class Tessera(object):
 
     def _read(self):
         if not os.path.exists(self.filename):
-            stderr.write("tessera file not found: %s\n" % self.fielname)
-            return None
+            raise TesseraError("tessera file not found: %s" % self.fielname)
 
         f = open(self.filename, 'r')
         self.body = f.read().split('\n')

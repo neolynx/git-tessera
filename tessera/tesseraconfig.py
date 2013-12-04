@@ -8,17 +8,15 @@ from ConfigParser import ConfigParser, NoSectionError, NoOptionError
 
 class TesseraConfig(object):
     def __init__(self, path):
-        if not os.path.exists(path):
-            raise ConfigFileNotFoundError(path)
-
         self._path = path
-        self._parse()
+        self._config = ConfigParser()
+        if os.path.exists(path):
+            self._parse()
 
     def get_path(self):
         return self._path
 
     def _parse(self):
-        self._config = ConfigParser()
         self._config.read(self._path)
 
     def has_option(self, section, option):

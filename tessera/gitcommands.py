@@ -186,6 +186,23 @@ class GitCommands(object):
         self.git_add(t.filename, "tessera updated: add tag %s to %s" % (args[1], t.get_attribute("title")))
         return True
 
+    def cmd_config(self, args):
+        if len(args) < 1:
+            raise ArgumentError("specify minimum one argument to read the config's value")
+
+        setting = args[0].split(".")
+        if len(setting) < 2:
+            raise ArgumentError("to set a config value you have to use the schema: section.option")
+
+        if len(args) > 1:
+            self._config.set(setting[0], setting[1], args[1])
+            self._config.store()
+            return True
+
+        option = self._config.get(setting[0], ".".join(setting[1:]))
+        print("%s has value %s" % (args[0], option))
+        return True
+
     def git_add(self, files, message):
         stderr.write("staging %s" % files)
         self.git.commit(message=message, files=files)

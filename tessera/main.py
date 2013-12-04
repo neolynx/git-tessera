@@ -20,7 +20,7 @@ def main():
         try:
             ret = getattr(t, "cmd_%s" % cmd)(argv[2:])
         except TesseraError, e:
-            stderr.write(colorful.bold_red(e))
+            stderr.write(colorful.bold_red("Error:") + " %s\n" % colorful.red(e))
         exit(0 if ret else 1)
     else:
         colorful.out.bold_red("unknown command: %s" % cmd)

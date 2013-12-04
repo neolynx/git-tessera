@@ -39,17 +39,8 @@ class GitCommands(object):
         os.mkdir(Tessera._tesserae)
 
         files = []
-        t = "%s/template" % Tessera._tesserae
-        shutil.copyfile("%s/config/template" % os.path.dirname(os.path.realpath(__file__)), t)
-        files.append(t)
-
-        t = "%s/status" % Tessera._tesserae
-        shutil.copyfile("%s/config/status" % os.path.dirname(os.path.realpath(__file__)), t)
-        files.append(t)
-
-        t = "%s/types" % Tessera._tesserae
-        shutil.copyfile("%s/config/types" % os.path.dirname(os.path.realpath(__file__)), t)
-        files.append(t)
+        for source in [ "template", "status", "types", "config" ]:
+            files.append(_install(Tessera._tesserae, source))
 
         self.git_add(files, "tessera: initialized")
         return True
@@ -242,3 +233,15 @@ def _edit(files, config):
             p = Popen([editor] + files)
     p.communicate()
     return p.wait()
+
+def _install(tesserae_path, source):
+    """ Installs the file named {source} from config directory of tessera into
+        the target repository.
+
+        @returns the full path to the target file
+    """
+    target_file = os.path.join(Tessera._tesserae, source)
+    source_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config", source)
+    shutil.copyfile(source_file, target_file)
+    return target_file
+

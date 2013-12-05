@@ -3,6 +3,7 @@
 import os
 import stat
 from sys import stderr
+from uuid import uuid1
 
 from gittle import Gittle
 from tessera import Tessera
@@ -68,4 +69,23 @@ class GitTessera(object):
         if not tessera_path:
             stderr.write("git tessera %s not found\n" % key)
             return None
+        return Tessera(tessera_path, self._config)
+
+    def create(self, title):
+        """ create a new tessera with title {title}.
+
+            @returns Tessera object of the new Tessera
+        """
+        uuid = uuid1()
+        tessera_path = "%s/%s" % (Tessera._tesserae, uuid)
+        tessera_file = "%s/tessera" % tessera_path
+        os.mkdir(tessera_path)
+        fin = open("%s/template" % Tessera._tesserae, "r")
+        fout = open(tessera_file, "w")
+        for line in fin.readlines():
+            if line == "@title@\n":
+                line = "# %s\n" % title
+            fout.write(line)
+        fin.close()
+        fout.close()
         return Tessera(tessera_path, self._config)

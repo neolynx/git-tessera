@@ -2,7 +2,6 @@
 
 import os
 import stat
-from uuid import uuid1
 from subprocess import Popen
 from sys import stdin, stdout, stderr
 import types
@@ -114,23 +113,11 @@ class GitCommands(object):
             title = " ".join(args)
         else:
             title = "tessera title goes here"
-        uuid = uuid1()
-        tessera_path = "%s/%s" % (Tessera._tesserae, uuid)
-        tessera_file = "%s/tessera" % tessera_path
-        os.mkdir(tessera_path)
-        fin = open("%s/template" % Tessera._tesserae, "r")
-        fout = open(tessera_file, "w")
-        for line in fin.readlines():
-            if line == "@title@\n":
-                line = "# %s\n" % title
-            fout.write(line)
-        fin.close()
-        fout.close()
+        gt = GitTessera(self._config)
+        t = gt.create(title)
 
-        _edit(tessera_file, self._config)
-
-        t = Tessera(tessera_path, self._config)
-        self.git_add(tessera_file, "tessera created: %s" % t.get_attribute("title"))
+        _edit(t.filename, self._config)
+        self.git_add(t.filename, "tessera created: %s" % t.get_attribute("title"))
         return True
 
     def cmd_remove(self, args):

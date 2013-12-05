@@ -116,7 +116,11 @@ class Tessera(object):
         return True
 
     def ident(self):
-        return dict(ident=self.tessera_hash, title=self.get_attribute("title"), filename=self.filename, body=self.get_body())
+        return dict(
+            ident=self.tessera_hash,
+            title=self.get_attribute("title"),
+            filename=self.filename,
+            body=self.body)
 
     def get_ident_short(self):
         return self.tessera_hash.split('-')[0]

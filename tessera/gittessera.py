@@ -21,7 +21,7 @@ class GitTessera(object):
     def __init__(self, config):
         self.gitdir = "."
         self.git = Gittle(self.gitdir)
-        self.tesserae = "%s/.tesserae" % self.gitdir
+        self.tesserae = os.path.join(self.gitdir, ".tesserae")
         self._config = config
 
     def ls(self, args=[]):

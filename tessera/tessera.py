@@ -16,7 +16,7 @@ class Tessera(object):
     def __init__(self, tessera_path, config):
         self.tessera_path = tessera_path
         self._config = config
-        self.filename = "%s/tessera" % tessera_path
+        self.filename = os.path.join(tessera_path, "tessera")
         self.mtime = os.lstat(self.filename).st_mtime
         self.tessera_hash = os.path.basename(self.tessera_path)
         self._attributes = {}

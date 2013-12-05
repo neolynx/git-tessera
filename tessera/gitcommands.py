@@ -9,7 +9,7 @@ import shutil
 
 from tessera import Tessera
 from gittessera import GitTessera
-from gittle import Gittle
+from mygit import MyGit
 from tesseraconfig import TesseraConfig
 from exceptions import TesseraError
 from colorful import colorful
@@ -18,9 +18,9 @@ from colorful import colorful
 class GitCommands(object):
 
     def __init__(self):
-        self.gitdir = "."
-        self.git = Gittle(self.gitdir)
-        Tessera._tesserae = os.path.relpath("%s/.tesserae" % self.gitdir)
+        git_directory = "."
+        self.git = MyGit(git_directory)
+        Tessera._tesserae = os.path.relpath(os.path.join(git_directory, ".tesserae"))
         self._config = TesseraConfig(os.path.join(Tessera._tesserae, "config"))
 
     def cmd_init(self, args):
@@ -41,7 +41,7 @@ class GitCommands(object):
         for source in [ "template", "status", "types", "config" ]:
             files.append(_install(Tessera._tesserae, source))
 
-        self.git_add(files, "tessera: initialized")
+        self.git.add(files, "tessera: initialized")
         return True
 
     def cmd_ls(self, args):
@@ -97,7 +97,7 @@ class GitCommands(object):
         #if self.git.is_dirty():
         for tessera_path in tessera_paths:
             t = Tessera(tessera_path, self._config)
-            self.git_add("%s/tessera" % tessera_path, "tessera updated: %s" % t.title)
+            self.git.add("%s/tessera" % tessera_path, "tessera updated: %s" % t.title)
         return True
 
     def cmd_create(self, args):
@@ -106,9 +106,8 @@ class GitCommands(object):
         #    return False
         gt = GitTessera(self._config)
         t = gt.create(" ".join(args)) if args else gt.create()
-
         _edit(t.filename, self._config)
-        self.git_add(t.filename, "tessera created: %s" % t.get_attribute("title"))
+        gt.commit(t)
         return True
 
     def cmd_remove(self, args):
@@ -142,7 +141,7 @@ class GitCommands(object):
             return False
         if not answer or answer.lower() == "y":
             files = ["%s/%s" % (tessera_path, x) for x in os.listdir(tessera_path)]
-            self.git_rm(files, "tessera removed: %s" % t.get_attribute("title"))
+            self.git.rm(files, "tessera removed: %s" % t.get_attribute("title"))
 
             from shutil import rmtree
             rmtree(tessera_path)
@@ -170,16 +169,8 @@ class GitCommands(object):
 
         t = Tessera(tessera_path, self._config)
         t.add_tag(args[1])
-        self.git_add(t.filename, "tessera updated: add tag %s to %s" % (args[1], t.get_attribute("title")))
+        self.git.add(t.filename, "tessera updated: add tag %s to %s" % (args[1], t.get_attribute("title")))
         return True
-
-    def git_add(self, files, message):
-        stderr.write("staging %s" % files)
-        self.git.commit(message=message, files=files)
-
-    def git_rm(self, files, message):
-        self.git.rm(files)
-        self.git.commit(message=message)
 
 
 def _edit(files, config):

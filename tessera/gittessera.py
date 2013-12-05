@@ -5,7 +5,7 @@ import stat
 from sys import stderr
 from uuid import uuid1
 
-from gittle import Gittle
+from mygit import MyGit
 from tessera import Tessera
 from colorful import colorful
 
@@ -20,7 +20,7 @@ class GitTessera(object):
 
     def __init__(self, config):
         self.gitdir = "."
-        self.git = Gittle(self.gitdir)
+        self.git = MyGit(self.gitdir)
         self.tesserae = os.path.join(self.gitdir, ".tesserae")
         self._config = config
 
@@ -61,7 +61,7 @@ class GitTessera(object):
 
     def get(self, key):
         for i in os.listdir(self.tesserae):
-            tessera_path = "%s/%s" % (self.tesserae, i)
+            tessera_path = os.path.join(self.tesserae, i)
             if not stat.S_ISDIR(os.lstat(tessera_path).st_mode):
                 continue
             if i.split('-')[0] == key or i == key:
@@ -77,10 +77,10 @@ class GitTessera(object):
             @returns Tessera object of the new Tessera
         """
         uuid = uuid1()
-        tessera_path = "%s/%s" % (Tessera._tesserae, uuid)
+        tessera_path = os.path.join(Tessera._tesserae, str(uuid))
         tessera_file = "%s/tessera" % tessera_path
         os.mkdir(tessera_path)
-        fin = open("%s/template" % Tessera._tesserae, "r")
+        fin = open(os.path.join(Tessera._tesserae, "template"), "r")
         fout = open(tessera_file, "w")
         for line in fin.readlines():
             if line == "@title@\n":
@@ -89,3 +89,12 @@ class GitTessera(object):
         fin.close()
         fout.close()
         return Tessera(tessera_path, self._config)
+
+    def commit(self, t):
+        """ commits a Tessera created by the create() method to the repository.
+        """
+        t.update()
+        self.git.add(t.filename, "tessera created: %s" % t.get_attribute("title"))
+
+
+

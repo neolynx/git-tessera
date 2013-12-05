@@ -21,11 +21,14 @@ class Tessera(object):
         self.tessera_hash = os.path.basename(self.tessera_path)
         self._attributes = {}
 
-        self._read()
-        self._parse()
+        self.update()
 
     def get_attribute(self, attribute):
         return self._attributes.get(attribute, "no %s" % attribute)
+
+    def update(self):
+        self._read()
+        self._parse()
 
     def _read(self):
         if not os.path.exists(self.filename):

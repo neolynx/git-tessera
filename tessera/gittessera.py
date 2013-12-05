@@ -71,7 +71,7 @@ class GitTessera(object):
             return None
         return Tessera(tessera_path, self._config)
 
-    def create(self, title):
+    def create(self, title="tessera title goes here"):
         """ create a new tessera with title {title}.
 
             @returns Tessera object of the new Tessera

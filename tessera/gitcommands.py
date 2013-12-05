@@ -101,20 +101,11 @@ class GitCommands(object):
         return True
 
     def cmd_create(self, args):
-        if len(args) < 1:
-            stderr.write("git tessera create needs arguments\n")
-            return False
-
         #if self.git.is_dirty():
         #    stderr.write("repo is dirty\n")
         #    return False
-
-        if args:
-            title = " ".join(args)
-        else:
-            title = "tessera title goes here"
         gt = GitTessera(self._config)
-        t = gt.create(title)
+        t = gt.create(" ".join(args)) if args else gt.create()
 
         _edit(t.filename, self._config)
         self.git_add(t.filename, "tessera created: %s" % t.get_attribute("title"))

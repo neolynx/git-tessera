@@ -7,7 +7,8 @@ clean:
 	sudo git clean -dxf
 
 tests:
-	radish -b tests/ tests/features/active/*
+	radish $(RADISH_OPTS) -b tests/ tests/features/active/*
 
 clean_install: clean install
+
 .PHONY: tests clean install

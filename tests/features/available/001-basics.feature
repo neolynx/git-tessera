@@ -1,8 +1,11 @@
 Feature: Basic Repo initialization and handling
 
+    Scenario: Preparation
+        Given I use a new temporary directory
+
     Scenario: First repo initialization
-        Given I initialize a git repository under "/tmp/testrepo/"
-        Given I use the repository under "/tmp/testrepo"
+        Given I initialize a git repository under the temporary directory
+        Given I use the repository under the temporary directory
 
     Scenario: First tessera initialization
         When I initialise tessera

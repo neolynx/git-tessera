@@ -34,14 +34,8 @@ class TesseraConfig(object):
         except NoOptionError:
             raise ConfigOptionNotFoundError(option, section, self._path)
 
-    def get_section(self, section):
-        try:
-            return self._config.get(section)
-        except NoSectionError:
-            raise ConfigSectionNotFoundError(section, self._path)
-
     def set(self, section, option, value):
-        self._config[section][option] = value
+        self._config.set(section, option, value)
 
     def store(self):
         with open(self._path, "w") as f:

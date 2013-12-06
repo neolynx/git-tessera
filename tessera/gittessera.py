@@ -2,12 +2,11 @@
 
 import os
 import stat
-from sys import stderr
 from uuid import uuid1
 
 from mygit import MyGit
 from tessera import Tessera
-from colorful import colorful
+from exceptions import ArgumentError, TesseraError
 
 
 class GitTessera(object):
@@ -34,11 +33,9 @@ class GitTessera(object):
         except ValueError:
             sortfunc = GitTessera.SORTING["status"]
         except IndexError:
-            colorful.out.bold_red("Please specify a sort algorithm. Available: %s" % (", ".join(GitTessera.SORTING.keys())))
-            return []
+            raise ArgumentError("Please specify a sort algorithm. Available: %s" % (", ".join(GitTessera.SORTING.keys())))
         except KeyError:
-            colorful.out.bold_red("No sort algorithm for '%s' available" % args[idx + 1])
-            return []
+            raise ArgumentError("No sort algorithm for '%s' available" % args[idx + 1])
 
         try:
             idx = args.index("--tags")
@@ -46,8 +43,7 @@ class GitTessera(object):
         except ValueError:
             tags = None
         except IndexError:
-            colorful.out.bold_red("Please specify minimum one tag.")
-            return []
+            raise ArgumentError("Please specify minimum one tag.")
 
         contents = [self.tesserae + "/" + x for x in os.listdir(self.tesserae) if stat.S_ISDIR(os.lstat(self.tesserae + "/" + x).st_mode)]
         tesserae = []
@@ -67,8 +63,7 @@ class GitTessera(object):
             if i.split('-')[0] == key or i == key:
                 break
         if not tessera_path:
-            stderr.write("git tessera %s not found\n" % key)
-            return None
+            raise TesseraError("git tessera %s not found" % key)
         return Tessera(tessera_path, self._config)
 
     def create(self, title="tessera title goes here"):

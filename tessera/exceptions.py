@@ -2,11 +2,16 @@
 
 
 class TesseraError(Exception):
-    def __init__(self):
-        self._message = "An undefined error occured"
+    def __init__(self, message=None):
+        self._message = "An undefined error occured" if message is None else message
 
     def __str__(self):
         return self._message
+
+
+class ArgumentError(TesseraError):
+    def __init__(self, message):
+        self._message = message
 
 
 class ConfigFileNotFoundError(TesseraError):

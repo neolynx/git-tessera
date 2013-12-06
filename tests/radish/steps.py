@@ -21,9 +21,9 @@ def I_use_the_repository_under(step):
 
 @step(u'I initialise tessera')
 def I_initialise_tessera(step):
-    assert subprocess.call(["git", "tessera", "init"], cwd=world.repository)
+    assert subprocess.call(["git", "tessera", "init"], cwd=world.repository) == 0
 
 @step(u'I create a Tessera')
 def I_create_a_Tessera(step):
-    assert False, "Not implemented yet"
+    assert subprocess.call(["git", "tessera", "create"], cwd=world.repository) == 0
 

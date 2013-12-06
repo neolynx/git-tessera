@@ -1,0 +1,10 @@
+# how do i override config editor setting for tests?
+@status new
+@type todo
+@tags
+
+How can i override the config editor setting for the tests.
+They should use the tests/bin/sensible-editor for editing the
+tessera. :-)
+
+Timo?

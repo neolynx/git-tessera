@@ -5,13 +5,13 @@ editor = vim
 name = Max Muster
 email = tuxmax@pinguins.pg
 
-[color "status"]
+[status]
 new = green
 open = brown
 done = bold_green
 obsolete = white
 
-[color "type"]
+[types]
 bug = red
 todo = white
 wishlist = blue

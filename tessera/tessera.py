@@ -72,11 +72,8 @@ class Tessera(object):
             self.content.append(l)
         self.content = "\n".join(self.content)
 
-        # FIXME: fix status id, why do we need this?
-        self.status_id = -1
-
-        # FIXME: fix type id, why do we need this?
-        self.te_type_id = -1
+        self._attributes["status_id"] = self._config.get_option_index("status", self._attributes["status"])
+        self._attributes["type_id"]   = self._config.get_option_index("types", self._attributes["type"])
 
     def _write(self):
         with open(self.filename, "w") as f:
@@ -94,7 +91,7 @@ class Tessera(object):
         len_status = len(status)
         tags = ", ".join(self._attributes["tags"])
         try:
-            color_status = self._config.get("color \"status\"", status)
+            color_status = self._config.get("status", status)
         except TesseraError, e:
             colorful.out.bold_red(e)
             return
@@ -103,7 +100,7 @@ class Tessera(object):
                 status = colorful.get(color_status)(status)
 
         try:
-            color_type = self._config.get("color \"type\"", te_type)
+            color_type = self._config.get("types", te_type)
         except TesseraError, e:
             colorful.out.bold_red(e)
             return

@@ -12,9 +12,8 @@ from exceptions import ArgumentError, TesseraError
 class GitTessera(object):
     SORTING = {
         "date": lambda t1, t2: t1.mtime < t2.mtime,
-        "status": lambda t1, t2: cmp(t1.status_id, t2.status_id),
+        "status": lambda t1, t2: cmp(t1.get_attribute("status_id"), t2.get_attribute("status_id")),
         "title": lambda t1, t2: cmp(t1.get_attribute("title").lower(), t2.get_attribute("title").lower()),
-        "hash": lambda t1, t2: cmp(t1.tessera_hash.lower(), t2.tessera_hash.lower())
     }
 
     def __init__(self, config):

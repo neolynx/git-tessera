@@ -4,3 +4,5 @@
 
 do not fail when not in top level git dir,
 try parent dir until fs border...
+
+should be implemented in dulwich

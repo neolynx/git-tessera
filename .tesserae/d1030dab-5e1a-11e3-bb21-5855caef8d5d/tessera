@@ -7,4 +7,4 @@ How can i override the config editor setting for the tests.
 They should use the tests/bin/sensible-editor for editing the
 tessera. :-)
 
-Timo?
+maybe write directly to _attributes ?

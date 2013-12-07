@@ -11,3 +11,15 @@ class MyGit:
         self.git.rm(files)
         self.git.commit(message=message)
 
+    def read_author(self, tessera_path):
+        author = "unknown"
+        author_time = 0;
+        walker = self.git.repo.get_walker(paths=[tessera_path])
+        try:
+            c = iter(walker).next().commit
+        except StopIteration:
+            print "Not found"
+        else:
+            author = c.author
+            author_time = c.author_time
+        return (author, author_time)

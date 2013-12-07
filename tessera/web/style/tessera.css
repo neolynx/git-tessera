@@ -44,7 +44,7 @@ div.title_todo
   padding: 2px;
   float: left;
   font-weight: bold;
-  width: 20em;
+  width: 40em;
   white-space: nowrap;
 }
 
@@ -52,7 +52,7 @@ div.title_bug
 {
   padding: 2px;
   float: left;
-  width: 20em;
+  width: 40em;
   font-weight: bold;
   color: red;
   white-space: nowrap;
@@ -62,7 +62,7 @@ div.title_wishlist
 {
   padding: 2px;
   float: left;
-  width: 20em;
+  width: 40em;
   font-weight: bold;
   color: blue;
   white-space: nowrap;
@@ -72,7 +72,7 @@ div.title_feature
 {
   padding: 2px;
   float: left;
-  width: 20em;
+  width: 40em;
   font-weight: bold;
   color: blue;
   white-space: nowrap;

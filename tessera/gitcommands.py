@@ -99,8 +99,7 @@ class GitCommands(object):
         #    return False
         gt = GitTessera(self._config)
         t = gt.create(" ".join(args)) if args else gt.create()
-        filename = os.path.join(t.tessera_path, "tessera")
-        _edit(filename, self._config)
+        _edit(t.filename, self._config)
         gt.commit(t)
         return True
 

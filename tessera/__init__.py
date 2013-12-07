@@ -2,3 +2,4 @@
 
 from gittessera import *
 from tessera import *
+from tesseraconfig import *

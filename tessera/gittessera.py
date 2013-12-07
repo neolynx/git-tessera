@@ -125,7 +125,7 @@ class GitTessera(object):
         """ commits a Tessera created by the create() method to the repository.
         """
         t.update()
-        files = [ os.path.join(t.tessera_path, "tessera"), os.path.join(t.tessera_path, "tessera") ]
+        files = [ os.path.join(t.tessera_path, "tessera"), os.path.join(t.tessera_path, "info") ]
         self.git.add(files, "tessera created: %s" % t.get_attribute("title"))
 
 

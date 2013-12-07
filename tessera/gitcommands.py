@@ -99,7 +99,8 @@ class GitCommands(object):
         #    return False
         gt = GitTessera(self._config)
         t = gt.create(" ".join(args)) if args else gt.create()
-        _edit(t.filename, self._config)
+        filename = os.path.join(t.tessera_path, "tessera")
+        _edit(filename, self._config)
         gt.commit(t)
         return True
 
@@ -154,7 +155,8 @@ class GitCommands(object):
 
         t = Tessera(tessera_path, self._config)
         t.add_tag(args[1])
-        self.git.add(t.filename, "tessera updated: add tag %s to %s" % (args[1], t.get_attribute("title")))
+        files = [ os.path.join(t.tessera_path, "tessera"), os.path.join(t.tessera_path, "info") ]
+        self.git.add(files, "tessera updated: add tag %s to %s" % (args[1], t.get_attribute("title")))
         return True
 
     def cmd_config(self, args):

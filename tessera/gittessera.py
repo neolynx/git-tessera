@@ -7,19 +7,31 @@ from uuid import uuid1
 from mygit import MyGit
 from tessera import Tessera
 from exceptions import ArgumentError, TesseraError
+from dulwich.config import StackedConfig
+from time import time
+
+def cmp_status( t1, t2 ):
+    s1 = t1.get_attribute("status_id")
+    s2 = t2.get_attribute("status_id")
+    if s1 != s2:
+        return cmp( s1, s2 )
+    return cmp( t2.get_attribute("updated"), t1.get_attribute("updated"))
 
 
 class GitTessera(object):
     SORTING = {
         "date": lambda t1, t2: t1.mtime < t2.mtime,
-        "status": lambda t1, t2: cmp(t1.get_attribute("status_id"), t2.get_attribute("status_id")),
+        "status": cmp_status,
         "title": lambda t1, t2: cmp(t1.get_attribute("title").lower(), t2.get_attribute("title").lower()),
     }
 
     def __init__(self, config):
         self.gitdir = "."
         self.git = MyGit(self.gitdir)
-        self.tesserae = os.path.join(self.gitdir, ".tesserae")
+        if self.gitdir != ".":
+           self.tesserae = os.path.join(self.gitdir, ".tesserae")
+        else:
+           self.tesserae = ".tesserae"
         self._config = config
 
     def ls(self, args=[]):
@@ -48,9 +60,25 @@ class GitTessera(object):
         tesserae = []
         for tessera_path in contents:
             t = Tessera(tessera_path, self._config)
+
+            if t.get_attribute("updated") == 0:
+                tessera_info = "%s/info" % tessera_path
+                fout = open(tessera_info, "w")
+                author, author_time = self.git.read_author(tessera_path)
+                import re
+                r = re.compile("^([^\<]+) \<([^\>]+)\>$")
+                m = r.search( author )
+                if m:
+                    fout.write("author: %s\n" % m.group(1))
+                    fout.write("email: %s\n" % m.group(2))
+                    fout.write("updated: %d\n"%author_time)
+                fout.close()
+
+
             te_tags = t.get_attribute("tags")
             if not tags or any(x in te_tags for x in tags):
                 tesserae.append(t)
+
         tesserae = sorted(tesserae, cmp=sortfunc)
         return tesserae
 
@@ -82,13 +110,23 @@ class GitTessera(object):
             fout.write(line)
         fin.close()
         fout.close()
+
+        tessera_info = "%s/info" % tessera_path
+        fout = open(tessera_info, "w")
+        c = StackedConfig(StackedConfig.default_backends())
+        fout.write("author: %s\n"%c.get("user", "name"))
+        fout.write("email: %s\n"%c.get("user", "email"))
+        fout.write("updated: %d\n"%int(time()))
+        fout.close()
+
         return Tessera(tessera_path, self._config)
 
     def commit(self, t):
         """ commits a Tessera created by the create() method to the repository.
         """
         t.update()
-        self.git.add(t.filename, "tessera created: %s" % t.get_attribute("title"))
+        files = [ os.path.join(t.tessera_path, "tessera"), os.path.join(t.tessera_path, "tessera") ]
+        self.git.add(files, "tessera created: %s" % t.get_attribute("title"))
 
 
 

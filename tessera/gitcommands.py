@@ -88,7 +88,9 @@ class GitCommands(object):
         #if self.git.is_dirty():
         for tessera_path in tessera_paths:
             t = Tessera(tessera_path, self._config)
-            self.git.add("%s/tessera" % tessera_path, "tessera updated: %s" % t.title)
+            t._write_info()
+            files = [ "%s/tessera" % tessera_path, "%s/info" % tessera_path ]
+            self.git.add( files, "tessera updated: %s" % t.get_attribute("title"))
         return True
 
     def cmd_create(self, args):

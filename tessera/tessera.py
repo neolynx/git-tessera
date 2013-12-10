@@ -77,7 +77,7 @@ class Tessera(object):
                     continue
                 tags_match = self.re_tags.search(l)
                 if tags_match:
-                    self._attributes["tags"] = set([x.strip() for x in self.tags_match.groupdict()["tags"].split(",")])
+                    self._attributes["tags"] = set([x.strip() for x in tags_match.groupdict()["tags"].split(",")])
                     continue
 
                 in_header = False

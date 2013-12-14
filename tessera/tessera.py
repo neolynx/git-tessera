@@ -12,13 +12,17 @@ from exceptions import TesseraError
 
 class Tessera(object):
     _tesserae  = None
-    re_title   = re.compile("^# (?P<title>.+)$")
-    re_status  = re.compile("^@status (?P<status>.*)$")
-    re_type    = re.compile("^@type (?P<type>.+)$")
-    re_tags    = re.compile("^@tags (?P<tags>.+)$")
-    re_author  = re.compile("^author: (.+)$")
-    re_email   = re.compile("^email: (.+)$")
-    re_updated = re.compile("^updated: (\d+)$")
+    keywords  = {
+        "# "       : "title",
+        "@status " : "status",
+        "@type "   : "type",
+        "@tags "   : "tags",
+    }
+    info = {
+        "author"  : "author: ",
+        "email"   : "email: ",
+        "updated" : "updated: ",
+    }
 
     def __init__(self, tessera_path, config):
         self.tessera_path = tessera_path
@@ -26,7 +30,7 @@ class Tessera(object):
         self.tessera_hash = os.path.basename(self.tessera_path)
         self.filename = os.path.join(self.tessera_path, "tessera")
         self.infofile = os.path.join(self.tessera_path, "info")
-        self._attributes = { "author": "unknown", "email": "", "updated": 0 }
+        self._attributes = { "author": "unknown", "email": "", "updated": 0, "tags": "" }
         self.body = []
         self.info = []
         self.update()
@@ -52,8 +56,8 @@ class Tessera(object):
             f.close()
 
     def _parse(self):
-        self._attributes["tags"] = set()
-        self.content = []
+        content = []
+        keywords = Tessera.keywords.keys()
         for l in self.body:
             comment = l.find("//")
             if comment != -1:
@@ -62,44 +66,34 @@ class Tessera(object):
             if comment != -1 and not l:
                 continue
 
-            title_match = self.re_title.search(l)
-            if title_match:
-                self._attributes["title"] = title_match.groupdict()["title"]
-                continue
-            status_match = self.re_status.search(l)
-            if status_match:
-                self._attributes["status"] = status_match.groupdict()["status"]
-                self._attributes["status_id"] = self._config.get_option_index("status", self._attributes["status"])
-                continue
-            type_match = self.re_type.search(l)
-            if type_match:
-                self._attributes["type"] = type_match.groupdict()["type"]
-                self._attributes["type_id"]   = self._config.get_option_index("types", self._attributes["type"])
-                continue
-            tags_match = self.re_tags.search(l)
-            if tags_match:
-                self._attributes["tags"] = set([x.strip() for x in tags_match.groupdict()["tags"].split(",")])
-                continue
+            kw = False
+            for k in keywords:
+                if l.startswith( k ):
+                    self._attributes[Tessera.keywords[k]] = l[len(k):]
+                    keywords.remove( k )
+                    kw = True
+                    break
 
-            self.content.append(l)
-        self.content = "\n".join(self.content)
+            if not kw:
+                content.append(l)
+
+        self.content = "\n".join(content)
+
+        if "status" in self._attributes:
+            self._attributes["status_id"] = self._config.get_option_index("status", self._attributes["status"])
+        if "type" in self._attributes:
+            self._attributes["type_id"] = self._config.get_option_index("types", self._attributes["type"])
+        if "tags" in self._attributes:
+            self._attributes["tags"] = set([x.strip() for x in self._attributes["tags"].split(",")])
 
         for l in self.info:
             l = l.strip()
             if not l:
                 continue
-            m = self.re_author.search(l)
-            if m:
-                self._attributes["author"] = m.group(1)
-                continue
-            m = self.re_email.search(l)
-            if m:
-                self._attributes["author_email"] = m.group(1)
-                continue
-            m = self.re_updated.search(l)
-            if m:
-                self._attributes["updated"] = m.group(1)
-                continue
+            for k, v in Tessera.info.iteritems():
+                if l.startswith( v ):
+                    self._attributes[k] = l[len(v):]
+                    break
 
 
     def _write(self):

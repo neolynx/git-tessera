@@ -54,33 +54,33 @@ class Tessera(object):
     def _parse(self):
         self._attributes["tags"] = set()
         self.content = []
-        in_header = True
         for l in self.body:
+            comment = l.find("//")
+            if comment != -1:
+                l = l[0 : comment]
             l = l.strip()
-            if in_header:
-                if not l:
-                    continue
+            if comment != -1 and not l:
+                continue
 
-                title_match = self.re_title.search(l)
-                if title_match:
-                    self._attributes["title"] = title_match.groupdict()["title"]
-                    continue
-                status_match = self.re_status.search(l)
-                if status_match:
-                    self._attributes["status"] = status_match.groupdict()["status"]
-                    self._attributes["status_id"] = self._config.get_option_index("status", self._attributes["status"])
-                    continue
-                type_match = self.re_type.search(l)
-                if type_match:
-                    self._attributes["type"] = type_match.groupdict()["type"]
-                    self._attributes["type_id"]   = self._config.get_option_index("types", self._attributes["type"])
-                    continue
-                tags_match = self.re_tags.search(l)
-                if tags_match:
-                    self._attributes["tags"] = set([x.strip() for x in tags_match.groupdict()["tags"].split(",")])
-                    continue
+            title_match = self.re_title.search(l)
+            if title_match:
+                self._attributes["title"] = title_match.groupdict()["title"]
+                continue
+            status_match = self.re_status.search(l)
+            if status_match:
+                self._attributes["status"] = status_match.groupdict()["status"]
+                self._attributes["status_id"] = self._config.get_option_index("status", self._attributes["status"])
+                continue
+            type_match = self.re_type.search(l)
+            if type_match:
+                self._attributes["type"] = type_match.groupdict()["type"]
+                self._attributes["type_id"]   = self._config.get_option_index("types", self._attributes["type"])
+                continue
+            tags_match = self.re_tags.search(l)
+            if tags_match:
+                self._attributes["tags"] = set([x.strip() for x in tags_match.groupdict()["tags"].split(",")])
+                continue
 
-                in_header = False
             self.content.append(l)
         self.content = "\n".join(self.content)
 

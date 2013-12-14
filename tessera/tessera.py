@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import os
-import re
-from time import time
-from sys import stderr
-
-from colorful import colorful
+from os import path
 
 from exceptions import TesseraError
-
 
 class Tessera(object):
     _tesserae  = None
@@ -27,9 +21,9 @@ class Tessera(object):
     def __init__(self, tessera_path, config):
         self.tessera_path = tessera_path
         self._config = config
-        self.tessera_hash = os.path.basename(self.tessera_path)
-        self.filename = os.path.join(self.tessera_path, "tessera")
-        self.infofile = os.path.join(self.tessera_path, "info")
+        self.tessera_hash = path.basename(self.tessera_path)
+        self.filename = path.join(self.tessera_path, "tessera")
+        self.infofile = path.join(self.tessera_path, "info")
         self._attributes = { "author": "unknown", "email": "", "updated": 0, "tags": "" }
         self.body = []
         self.info = []
@@ -43,14 +37,14 @@ class Tessera(object):
         self._parse()
 
     def _read(self):
-        if not os.path.exists(self.filename):
+        if not path.exists(self.filename):
             raise TesseraError("tessera file not found: %s" % self.filename)
 
         f = open(self.filename, 'r')
         self.body = f.read().split('\n')
         f.close()
 
-        if os.path.exists(self.infofile):
+        if path.exists(self.infofile):
             f = open(self.infofile, 'r')
             self.info = f.read().split('\n')
             f.close()
@@ -110,11 +104,13 @@ class Tessera(object):
 
     def _write_info(self):
         with open(self.infofile, "w") as f:
+            from time import time
             f.write("author: %s\n" % self.get_attribute("author"))
             f.write("email: %s\n" % self.get_attribute("author_email"))
             f.write("updated: %d\n" % int(time()))
 
     def summary(self):
+        from colorful import colorful
         title = self.get_attribute("title")
         status = self.get_attribute("status")
         te_type = self.get_attribute("type")

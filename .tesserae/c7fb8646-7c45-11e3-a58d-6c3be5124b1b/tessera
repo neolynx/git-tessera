@@ -1,0 +1,17 @@
+# key word error
+@status new
+@type todo
+@tags
+
+Traceback (most recent call last):
+  File "/usr/local/bin/git-tessera", line 9, in <module>
+    load_entry_point('git-tessera==0.00.01', 'console_scripts', 'git-tessera')()
+  File "/usr/local/lib/python2.7/dist-packages/git_tessera-0.00.01-py2.7.egg/tessera/main.py", line 19, in main
+    if not getattr(t, "cmd_%s" % cmd)(argv[2:]):
+  File "/usr/local/lib/python2.7/dist-packages/git_tessera-0.00.01-py2.7.egg/tessera/gitcommands.py", line 140, in cmd_create
+    t = Tessera(tessera_path)
+  File "/usr/local/lib/python2.7/dist-packages/git_tessera-0.00.01-py2.7.egg/tessera/tessera.py", line 30, in __init__
+    self._parse()
+  File "/usr/local/lib/python2.7/dist-packages/git_tessera-0.00.01-py2.7.egg/tessera/tessera.py", line 110, in _parse
+    if self._attributes["status"]:
+KeyError: 'status'

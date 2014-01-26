@@ -24,6 +24,10 @@ def main():
         exit(0 if ret else 1)
     else:
         colorful.out.bold_red("unknown command: %s" % cmd)
+        attribs = dir(t)
+        for cmd in attribs:
+            if cmd.startswith("cmd_"):
+                colorful.out.underline(cmd[4:])
         exit(2)
 
 if __name__ == "__main__":

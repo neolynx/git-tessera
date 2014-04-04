@@ -16,14 +16,14 @@ class ArgumentError(TesseraError):
 
 class ConfigFileNotFoundError(TesseraError):
     def __init__(self, path):
-        self._message = "Could not found config file at '%s'" % path
+        self._message = "Could not find config file at '%s'" % path
 
 
 class ConfigSectionNotFoundError(TesseraError):
     def __init__(self, section, path):
-        self._message = "Could not found section %s in config file %s" % (section, path)
+        self._message = "Could not find section %s in config file %s" % (section, path)
 
 
 class ConfigOptionNotFoundError(TesseraError):
     def __init__(self, attribute, section, path):
-        self._message = "Could not found option %s in section %s in config file %s" % (attribute, section, path)
+        self._message = "Could not find option '%s' in section '%s' in config file '%s'" % (attribute, section, path)

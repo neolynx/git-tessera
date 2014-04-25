@@ -26,7 +26,7 @@ def main():
         colorful.out.bold_red("unknown command: %s" % cmd)
         for cmd in dir(t):
             if cmd.startswith("cmd_"):
-                colorful.out.underline("%s - %s" % (cmd[4:], cmd.func_doc))
+                colorful.out.underline(cmd[4:])
         exit(2)
 
 if __name__ == "__main__":

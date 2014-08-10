@@ -1,6 +1,6 @@
 # key word error
 @status new
-@type todo
+@type bug
 @tags
 
 Traceback (most recent call last):

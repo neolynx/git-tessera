@@ -1,0 +1,12 @@
+# Fix WARNING:root:STAGING
+@status new
+@type bug
+@tags gittle
+
+unfortunately gittle does not handle symlinks somehow, therefore this message !?!
+
+WARNING:root:STAGING : ['.tesserae/c7fb8646-7c45-11e3-a58d-6c3be5124b1b/tessera', '.tesserae/c7fb8646-7c45-11e3-a58d-6c3be5124b1b/info']
+
+see: https://github.com/FriendCode/gittle/issues/23
+
+

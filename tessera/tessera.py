@@ -52,34 +52,38 @@ class Tessera(object):
     def _parse(self):
         content = []
         keywords = Tessera.keywords.keys()
+        attributes = {}
         for l in self.body:
             comment = l.find("//")
             if comment != -1:
                 l = l[0 : comment]
             l = l.strip()
-            if comment != -1 and not l:
+            if not l:
                 continue
 
             kw = False
-            for k in keywords:
-                if l.startswith( k ):
-                    self._attributes[Tessera.keywords[k]] = l[len(k):]
-                    keywords.remove( k )
-                    kw = True
-                    break
+            if l[0] == "@" or l[0] == "#":
+                for k in keywords:
+                    if l.startswith( k ):
+                        attributes[Tessera.keywords[k]] = l[len(k):]
+                        keywords.remove( k )
+                        kw = True
+                        break
 
             if not kw:
                 content.append(l)
 
         self.content = "\n".join(content)
 
-        if "status" in self._attributes:
-            self._attributes["status_id"] = self._config.get_option_index("status", self._attributes["status"])
-        if "type" in self._attributes:
-            self._attributes["type_id"] = self._config.get_option_index("types", self._attributes["type"])
-        if "tags" in self._attributes:
-            self._attributes["tags"] = set([x.strip() for x in self._attributes["tags"].split(",")])
-
+        for k, v in attributes.items():
+            if k == "status":
+                self._attributes["status_id"] = self._config.get_option_index("status", v)
+            elif k == "type":
+                self._attributes["type_id"] = self._config.get_option_index("types", v)
+            elif k == "tags":
+                self._attributes[k] = set([x.strip() for x in v.split(",")])
+            else:
+                self._attributes[k] = v
         for l in self.info:
             l = l.strip()
             if not l:
@@ -112,8 +116,8 @@ class Tessera(object):
     def summary(self):
         from colorful import colorful
         title = self.get_attribute("title")
-        status = self.get_attribute("status")
-        te_type = self.get_attribute("type")
+        status = self._config.get_option_name( "status", self.get_attribute("status_id"))
+        te_type = self._config.get_option_name( "types", self.get_attribute("type_id"))
         len_title = len(title)
         len_status = len(status)
         tags = ", ".join(self._attributes["tags"])

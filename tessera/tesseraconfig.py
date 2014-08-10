@@ -36,6 +36,13 @@ class TesseraConfig(object):
         except:
             return -1
 
+    def get_option_name(self, section, idx):
+        try:
+            options = self._config.options(section)
+        except:
+            return "?"
+        return options[idx]
+
     def get(self, section, option):
         try:
             return self._config.get(section, option)

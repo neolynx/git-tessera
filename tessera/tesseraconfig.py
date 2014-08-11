@@ -41,6 +41,8 @@ class TesseraConfig(object):
             options = self._config.options(section)
         except:
             return "?"
+        if idx == None:
+            return "no " + section
         return options[idx]
 
     def get(self, section, option):

@@ -30,11 +30,11 @@ class Tessera(object):
         self.update()
 
     def get_attribute(self, attribute):
-        return self._attributes.get(attribute, "no %s" % attribute)
+        return self._attributes.get(attribute, None)
 
     def update(self):
         self._read()
-        self._parse()
+        return self._parse()
 
     def _read(self):
         if not path.exists(self.filename):
@@ -77,9 +77,17 @@ class Tessera(object):
 
         for k, v in attributes.items():
             if k == "status":
-                self._attributes["status_id"] = self._config.get_option_index("status", v)
+                idx = self._config.get_option_index("status", v)
+                if idx == -1:
+                    print "invalid status:", v
+                    return False
+                self._attributes["status_id"] = idx
             elif k == "type":
-                self._attributes["type_id"] = self._config.get_option_index("types", v)
+                idx = self._config.get_option_index("types", v)
+                if idx == -1:
+                    print "invalid type:", v
+                    return False
+                self._attributes["type_id"] = idx
             elif k == "tags":
                 self._attributes[k] = set([x.strip() for x in v.split(",")])
             else:
@@ -92,6 +100,7 @@ class Tessera(object):
                 if l.startswith( v ):
                     self._attributes[k] = l[len(v):]
                     break
+        return True
 
 
     def _write(self):
@@ -118,14 +127,15 @@ class Tessera(object):
         title = self.get_attribute("title")
         status = self._config.get_option_name( "status", self.get_attribute("status_id"))
         te_type = self._config.get_option_name( "types", self.get_attribute("type_id"))
+        if not title:
+            title = "untitled"
         len_title = len(title)
         len_status = len(status)
         tags = ", ".join(self._attributes["tags"])
         try:
             color_status = self._config.get("status", status)
         except TesseraError, e:
-            colorful.out.bold_red(e)
-            return
+            color_status = "red"
         if color_status:
             if colorful.exists(color_status):
                 status = colorful.get(color_status)(status)
@@ -133,8 +143,7 @@ class Tessera(object):
         try:
             color_type = self._config.get("types", te_type)
         except TesseraError, e:
-            colorful.out.bold_red(e)
-            return
+            color_type = "red"
         if color_type:
             if colorful.exists(color_type):
                 title = colorful.get(color_type)(title)

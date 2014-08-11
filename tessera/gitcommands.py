@@ -32,7 +32,7 @@ class GitCommands(object):
         os.mkdir(Tessera._tesserae)
 
         files = []
-        for source in [ "template", "status", "types", "config" ]:
+        for source in [ "template", "config" ]:
             files.append(_install(Tessera._tesserae, source))
 
         self.git.add(files, "tessera: initialized")
@@ -99,9 +99,20 @@ class GitCommands(object):
         #    return False
         gt = GitTessera(self._config)
         t = gt.create(" ".join(args)) if args else gt.create()
-        _edit(t.filename, self._config)
-        gt.commit(t)
-        return True
+        while True:
+            _edit(t.filename, self._config)
+            if t.update():
+                gt.commit(t)
+                return True
+            stdout.write("Abort ? [y/N] ")
+            try:
+                answer = stdin.readline().strip()
+            except KeyboardInterrupt:
+                break
+            if answer and answer.lower() == "y":
+                break
+
+        return False
 
     def cmd_remove(self, args):
         if len(args) != 1:

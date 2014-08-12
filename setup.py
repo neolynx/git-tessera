@@ -32,22 +32,14 @@ setup(
         "Intended Audience :: Other Audience",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Natural Language :: English",
-        "Operating System :: MacOS :: MacOS X",
         "Operating System :: OS Independent",
-        "Operating System :: Microsoft :: Windows",
-        "Operating System :: Microsoft :: Windows :: Windows 7",
-        "Operating System :: Microsoft :: Windows :: Windows XP",
-        "Operating System :: POSIX",
-        "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: Implementation",
-        "Topic :: Education :: Issue Tracking",
         "Topic :: Software Development",
-        "Topic :: Software Development :: Issue Tracking"
-        "Topic :: Software Development :: git"
+        "Topic :: Software Development :: Bug Tracking"
     ],
 )

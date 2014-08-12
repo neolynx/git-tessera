@@ -81,12 +81,14 @@ class Tessera(object):
                 if idx == -1:
                     print "invalid status:", v
                     return False
+                self._attributes["status"] = v
                 self._attributes["status_id"] = idx
             elif k == "type":
                 idx = self._config.get_option_index("types", v)
                 if idx == -1:
                     print "invalid type:", v
                     return False
+                self._attributes["type"] = v
                 self._attributes["type_id"] = idx
             elif k == "tags":
                 self._attributes[k] = set([x.strip() for x in v.split(",")])
@@ -125,8 +127,8 @@ class Tessera(object):
     def summary(self):
         from colorful import colorful
         title = self.get_attribute("title")
-        status = self._config.get_option_name( "status", self.get_attribute("status_id"))
-        te_type = self._config.get_option_name( "types", self.get_attribute("type_id"))
+        status = self.get_attribute("status")
+        te_type = self.get_attribute("type")
         if not title:
             title = "untitled"
         len_title = len(title)

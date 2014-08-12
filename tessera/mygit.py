@@ -18,7 +18,7 @@ class MyGit:
         try:
             c = iter(walker).next().commit
         except StopIteration:
-            print "Not found"
+            print "git: author not found in %s" % tessera_path
         else:
             author = c.author
             author_time = c.author_time

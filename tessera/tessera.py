@@ -4,6 +4,9 @@ from os import path
 
 from exceptions import TesseraError
 
+def utf8len(s):
+    return len(s.decode('utf-8'))
+
 class Tessera(object):
     _tesserae  = None
     keywords  = {
@@ -136,11 +139,11 @@ class Tessera(object):
 
         if not title:
             title = "untitled"
-        l_title = len(title)
+        l_title = utf8len(title)
 
         if not status:
             status = "no status"
-        l_status = len(status)
+        l_status = utf8len(status)
         try:
             color_status = self._config.get("status", status)
         except TesseraError, e:
@@ -150,7 +153,7 @@ class Tessera(object):
 
         if not te_type:
             te_type = "no type"
-        l_type = len(te_type)
+        l_type = utf8len(te_type)
         try:
             color_type = self._config.get("types", te_type)
         except TesseraError, e:
@@ -161,7 +164,7 @@ class Tessera(object):
             title = colorful.get(color_type)(title)
 
         author = self._attributes["author"]
-        l_author = len(author)
+        l_author = utf8len(author)
 
         tags = ", ".join(self._attributes["tags"])
 

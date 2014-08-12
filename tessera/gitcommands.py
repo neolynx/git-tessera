@@ -82,15 +82,35 @@ class GitCommands(object):
 
             tessera_paths.append(tessera_path)
 
-        tessera_files = ["%s/tessera" % x for x in tessera_paths]
-        _edit(tessera_files, self._config)
+        while True:
+            tessera_files = ["%s/tessera" % x for x in tessera_paths]
+            _edit(tessera_files, self._config)
 
-        #if self.git.is_dirty():
-        for tessera_path in tessera_paths:
-            t = Tessera(tessera_path, self._config)
-            t._write_info()
-            files = [ "%s/tessera" % tessera_path, "%s/info" % tessera_path ]
-            self.git.add( files, "tessera updated: %s" % t.get_attribute("title"))
+            # if self.git.is_dirty():
+            failed = []
+            while tessera_paths:
+                tessera_path = tessera_paths.pop()
+                t = Tessera(tessera_path, self._config)
+                if not t.error:
+                    t._write_info()
+                    files = [ "%s/tessera" % tessera_path, "%s/info" % tessera_path ]
+                    self.git.add( files, "tessera updated: %s" % t.get_attribute("title"))
+                    continue
+                # failed parsing
+                failed.append(tessera_path)
+
+            if failed:
+                stdout.write("Abort ? [y/N] ")
+                try:
+                    answer = stdin.readline().strip()
+                except KeyboardInterrupt:
+                    break
+                if answer and answer.lower() == "y":
+                    break
+                tessera_paths = failed
+            else:
+                break
+
         return True
 
     def cmd_create(self, args):

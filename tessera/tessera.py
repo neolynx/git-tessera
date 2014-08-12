@@ -25,6 +25,7 @@ class Tessera(object):
         self.filename = path.join(self.tessera_path, "tessera")
         self.infofile = path.join(self.tessera_path, "info")
         self._attributes = { "author": "unknown", "email": "", "updated": 0, "tags": "" }
+        self.error = False
         self.body = []
         self.info = []
         self.update()
@@ -75,19 +76,22 @@ class Tessera(object):
 
         self.content = "\n".join(content)
 
+        self.error = False
         for k, v in attributes.items():
             if k == "status":
                 idx = self._config.get_option_index("status", v)
                 if idx == -1:
-                    print "invalid status:", v
-                    return False
+                    print "%s: invalid status: %s" % (self.filename ,v)
+                    self.error = True
+                    continue
                 self._attributes["status"] = v
                 self._attributes["status_id"] = idx
             elif k == "type":
                 idx = self._config.get_option_index("types", v)
                 if idx == -1:
-                    print "invalid type:", v
-                    return False
+                    print "%s: invalid type: %s" % (self.filename ,v)
+                    self.error = True
+                    continue
                 self._attributes["type"] = v
                 self._attributes["type_id"] = idx
             elif k == "tags":
@@ -102,7 +106,7 @@ class Tessera(object):
                 if l.startswith( v ):
                     self._attributes[k] = l[len(v):]
                     break
-        return True
+        return not self.error
 
 
     def _write(self):
@@ -129,28 +133,44 @@ class Tessera(object):
         title = self.get_attribute("title")
         status = self.get_attribute("status")
         te_type = self.get_attribute("type")
+
         if not title:
             title = "untitled"
-        len_title = len(title)
-        len_status = len(status)
-        tags = ", ".join(self._attributes["tags"])
+        l_title = len(title)
+
+        if not status:
+            status = "no status"
+        l_status = len(status)
         try:
             color_status = self._config.get("status", status)
         except TesseraError, e:
             color_status = "red"
-        if color_status:
-            if colorful.exists(color_status):
-                status = colorful.get(color_status)(status)
+        if color_status and colorful.exists(color_status):
+            status = colorful.get(color_status)(status)
 
+        if not te_type:
+            te_type = "no type"
+        l_type = len(te_type)
         try:
             color_type = self._config.get("types", te_type)
         except TesseraError, e:
             color_type = "red"
-        if color_type:
-            if colorful.exists(color_type):
-                title = colorful.get(color_type)(title)
+            te_type = colorful.get(color_type)(te_type)
 
-        return "%s %s %s %s %s %s %s %s %s" % (self.get_ident_short(), title, " " * (60 - len_title), status, " " * (10 - len_status), te_type, " " * (10 - len(te_type)), self._attributes["author"], tags)
+        if color_type and colorful.exists(color_type):
+            title = colorful.get(color_type)(title)
+
+        author = self._attributes["author"]
+        l_author = len(author)
+
+        tags = ", ".join(self._attributes["tags"])
+
+        return "%s %s %s %s %s %s %s %s %s %s" % (self.get_ident_short(),
+                                               title,   " " * (60 - l_title),
+                                               status,  " " * (10 - l_status),
+                                               te_type, " " * (10 - l_type),
+                                               author,  " " * (20 - l_author),
+                                               tags)
 
     def add_tag(self, tag):
         self._attributes["tags"].add(tag)

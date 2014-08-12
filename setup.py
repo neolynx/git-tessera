@@ -10,8 +10,8 @@ setup(
     name="git-tessera",
     version=tessera_version.__version__,
     license="GPL",
-    description="manage your issues in your repository",
-    author="André Roth, Claudio Klingler",
+    description="git intransic issue tracking",
+    author="André Roth",
     author_email="neolynx@gmail.com",
     maintainer="André Roth",
     maintainer_email="neolynx@gmail.com",
@@ -45,8 +45,9 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: Implementation",
-        "Topic :: Education :: Testing",
+        "Topic :: Education :: Issue Tracking",
         "Topic :: Software Development",
-        "Topic :: Software Development :: Testing"
+        "Topic :: Software Development :: Issue Tracking"
+        "Topic :: Software Development :: git"
     ],
 )

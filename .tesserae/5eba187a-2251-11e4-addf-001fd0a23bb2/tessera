@@ -1,0 +1,6 @@
+# check dirty
+@status new
+@type todo
+@tags git
+
+require user to stash changes if dirty
